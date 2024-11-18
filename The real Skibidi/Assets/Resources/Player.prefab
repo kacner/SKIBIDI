@@ -58,7 +58,7 @@ CapsuleCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.5
-  m_Height: 1
+  m_Height: 1.97
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &6174271088815081792
@@ -100,9 +100,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e6aef41f228e413459bfd8fc3dba0be8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rb: {fileID: 0}
   moveSpeed: 5
+  swayMovement: 7
   lookSpeed: 2
   playerCamera: {fileID: 3888822346741301682}
+  can_Jump: 0
+  jumping_Force: 4
+  ray_Offset_Down: {x: 0, y: -1.06, z: 0}
+  ray_Distens: 0.1
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 8
 --- !u!114 &57689362513737628
 MonoBehaviour:
   m_ObjectHideFlags: 0
