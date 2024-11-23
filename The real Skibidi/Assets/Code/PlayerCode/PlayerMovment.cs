@@ -2,6 +2,9 @@ using UnityEngine;
 using Photon.Pun;
 using Photon.Pun.UtilityScripts;
 using System.Threading;
+using TMPro;
+using Unity.VisualScripting;
+using UnityEditor.Rendering;
 
 public class PlayerMovment : MonoBehaviourPunCallbacks
 {
@@ -16,11 +19,12 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
     [Header("Movment")]
     public float walking_Speed = 5f;
     public float crouching_Speed = 2.5f;
-    private bool can_Slid;
     public float sliding_Force = 3f; // Force applied during the dash
-    public Vector3 movment_Force;
     private float sliding_Speed_Index;
     private float player_Speed_Index;
+    private bool can_Slid;
+    private bool can_Slid_Called;
+    public Vector3 movment_Force;
 
     [Header("Jumping settings")]
     public bool can_Jump;
@@ -29,6 +33,7 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
     public LayerMask groundLayer; // Add this for layer masking
     public Vector3 ray_Offset_Down;
     public float ray_Distens;
+    private RaycastHit ground_raycast_Hit;
 
     [Header("Camera settings")]
     public float lookSpeed = 2f;
@@ -36,7 +41,7 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
     private float x_Rotation = 0f;
     private float mouseX;
     private float mouseY;
-    
+
 
     void Awake()
     {
@@ -63,9 +68,9 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
         if (photonView.IsMine)
         {
             UserInput();
-            JumpingPlayer();
             MovePlayer();
             LookAround();
+            JumpingPlayer();
         }
     }
 
@@ -77,10 +82,10 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
         input_sliding = Input.GetKey(KeyCode.LeftControl);
     }
 
-    private void MovePlayer()
+    void MovePlayer()
     {
         movment_Force = transform.right * input_Horizontal + transform.forward * input_Veritcal;
-
+        transform.position += movment_Force * walking_Speed * Time.deltaTime;
         if (input_sliding != true)
         {
             transform.position += movment_Force * walking_Speed * Time.deltaTime;
@@ -89,47 +94,70 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
 
         if (input_sliding)
         {
-            if (movment_Force.x == 0 && movment_Force.z == 0)
+            if (movment_Force.x == 0 && movment_Force.z == 0 && can_Slid_Called != true)
+            {
+                can_Slid_Called = true;
                 can_Slid = false;
-            else
+            }
+            else if (movment_Force.x != 0 && movment_Force.z != 0 && can_Slid_Called != true)
                 can_Slid = true;
+
             Crouching(can_Slid);
+            transform.localScale = new Vector3(transform.localScale.x, 0.5f, transform.localScale.z);
         }
         else // if there is no longer sliding input
         {
             walking_Speed = player_Speed_Index;
             sliding_Force = sliding_Speed_Index;
-            Debug.Log($"move_Speed > {walking_Speed}");
-            Debug.Log($"dashForce > {sliding_Force}");
+            transform.localScale = new Vector3(transform.localScale.x, 1, transform.localScale.z);
+            can_Slid_Called = false;
         }
-           
+
         if (can_Jump && input_Jump) // if it found ground
         {
             rb.linearVelocity = new Vector3(rb.linearVelocity.x, jumping_Force, rb.linearVelocity.z); // jumping force
             can_Jump = false; // one jump
-            Debug.Log("DEBUG : player jumping");
         }
     }
 
-    private void JumpingPlayer()
+    void JumpingPlayer()
     {
-        RaycastHit hit;
-        Vector3 origin = transform.position + ray_Offset_Down;
+        Vector3 origin = transform.position + ray_Offset_Down * transform.localScale.y + Vector3.up * 0.1f;
         Vector3 direction = Vector3.down;
 
-        Debug.DrawRay(origin, direction * ray_Distens, Color.red);
+        // Perform the raycast
+        bool raycolider = Physics.Raycast(origin, direction, out ground_raycast_Hit, ray_Distens);
 
-        if (Physics.Raycast(origin, direction, out hit, ray_Distens, groundLayer))
+        if (raycolider)
         {
-            if (hit.collider.CompareTag("Ground"))
-                can_Jump = true; // if it found ground
+            Debug.DrawRay(origin, direction * ray_Distens, Color.green);
+            Debug.Log($"DEBUG JPC : Raycast hit object - Name: {ground_raycast_Hit.collider.name}, Tag: {ground_raycast_Hit.collider.tag}");
+
+            if (ground_raycast_Hit.collider.CompareTag("Ground"))
+            {
+                can_Jump = true;
+                Debug.Log("DEBUG JPC : Raycast hit the ground.");
+            }
             else
-                can_Jump = false; // if there is no ground
+            {
+                can_Jump = false;
+                Debug.Log("DEBUG JPC : Raycast did not hit the ground.");
+            }
+        }
+        else
+        {
+            can_Jump = false;
+            Debug.DrawRay(origin, direction * ray_Distens, Color.red);
+            Debug.LogWarning("DEBUG JPC : Raycast did not hit anything.");
         }
     }
 
-    private void Crouching(bool slidingPerms)
+
+    void Crouching(bool slidingPerms)
     {
+        if (!slidingPerms)
+            transform.position += movment_Force * crouching_Speed * Time.deltaTime;
+
         if (sliding_Force < walking_Speed) // this is the main crouching system that works
         {
             transform.position += movment_Force * crouching_Speed * Time.deltaTime;
@@ -139,12 +167,11 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
         if (slidingPerms) // this needs to be work on due to it wont go down on its own
         {
             transform.position += movment_Force * sliding_Force * Time.deltaTime;
-            sliding_Force = sliding_Force + walking_Speed - Time.deltaTime;
-            Debug.Log("Sliding force " + sliding_Force);
+            sliding_Force -= Time.deltaTime * 5; // replace latter with animashon curve
         }
     }
 
-    private void LookAround()
+    void LookAround()
     {
         mouseX = Input.GetAxis("Mouse X") * lookSpeed;
         mouseY = Input.GetAxis("Mouse Y") * lookSpeed;
@@ -158,6 +185,4 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
         // Sync camera position with player position
         playerCamera.transform.position = transform.position;
     }
-
-
 }
