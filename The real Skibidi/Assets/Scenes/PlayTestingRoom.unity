@@ -1865,12 +1865,20 @@ PrefabInstance:
       value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 5471207374134743419, guid: 8f39f839a7573794881b53ef5691986a, type: 3}
+      propertyPath: walking_Speed
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 5471207374134743419, guid: 8f39f839a7573794881b53ef5691986a, type: 3}
       propertyPath: ray_Offset_Down.y
       value: 0.2
       objectReference: {fileID: 0}
+    - target: {fileID: 6174271088815081792, guid: 8f39f839a7573794881b53ef5691986a, type: 3}
+      propertyPath: m_Drag
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8123782941140459995, guid: 8f39f839a7573794881b53ef5691986a, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 8.96
+      value: 8.72
       objectReference: {fileID: 0}
     - target: {fileID: 8123782941140459995, guid: 8f39f839a7573794881b53ef5691986a, type: 3}
       propertyPath: m_LocalPosition.y
@@ -1878,7 +1886,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8123782941140459995, guid: 8f39f839a7573794881b53ef5691986a, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 11.28
+      value: 13.44
       objectReference: {fileID: 0}
     - target: {fileID: 8123782941140459995, guid: 8f39f839a7573794881b53ef5691986a, type: 3}
       propertyPath: m_LocalRotation.w
