@@ -24,6 +24,8 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
     private bool isSprinting;
     public Vector3 MoveDir;
 
+    public Transform orientation;
+
     [Header("Jumping settings")]
     public bool can_Jump;
     public float jumping_Force;
@@ -33,13 +35,6 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
     public float ray_Distens;
     private RaycastHit ground_raycast_Hit;
 
-    [Header("Camera settings")]
-    public float lookSpeed = 2f;
-    public Transform playerCamera;
-    private float x_Rotation = 0f;
-    private float mouseX;
-    private float mouseY;
-
 
     void Awake()
     {
@@ -47,16 +42,6 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
         OG_sliding_Speed = sliding_Speed;
 
         sliding_Speed = sliding_Speed + walking_Speed;
-
-        // Disable the camera for other players
-        if (!photonView.IsMine)
-        {
-            playerCamera.gameObject.SetActive(false);
-        }
-        else
-        {
-            Cursor.lockState = CursorLockMode.Locked;
-        }
 
         rb = GetComponent<Rigidbody>();
     }
@@ -67,7 +52,6 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
         {
             UserInput();
             MovePlayer();
-            LookAround();
             JumpingPlayer();
         }
     }
@@ -121,7 +105,7 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
 
     void MovePlayer()
     {
-        MoveDir = new Vector3(input_Horizontal, 0, input_Veritcal);
+        MoveDir = orientation.forward * input_Veritcal + orientation.right * input_Horizontal;
 
         if (!input_sliding)
         {
@@ -201,20 +185,5 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
             rb.AddForce(MoveDir * sliding_Speed * Time.deltaTime, ForceMode.Force); //sliding
             sliding_Speed -= Time.deltaTime * 5; // replace latter with animashon curve
         }
-    }
-
-    void LookAround()
-    {
-        mouseX = Input.GetAxis("Mouse X") * lookSpeed;
-        mouseY = Input.GetAxis("Mouse Y") * lookSpeed;
-
-        x_Rotation -= mouseY;
-        x_Rotation = Mathf.Clamp(x_Rotation, -90f, 90f);
-
-        playerCamera.localRotation = Quaternion.Euler(x_Rotation, 0f, 0f);
-        transform.Rotate(Vector3.up * mouseX);
-
-        // Sync camera position with player position
-        playerCamera.transform.position = transform.position;
     }
 }
