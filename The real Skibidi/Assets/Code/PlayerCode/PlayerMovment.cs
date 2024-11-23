@@ -1,10 +1,5 @@
 using UnityEngine;
 using Photon.Pun;
-using Photon.Pun.UtilityScripts;
-using System.Threading;
-using TMPro;
-using Unity.VisualScripting;
-using UnityEditor.Rendering;
 
 public class PlayerMovment : MonoBehaviourPunCallbacks
 {
@@ -18,13 +13,16 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
 
     [Header("Movment")]
     public float walking_Speed = 5f;
+    public float Running_Speed = 5f;
     public float crouching_Speed = 2.5f;
-    public float sliding_Force = 3f; // Force applied during the dash
-    private float sliding_Speed_Index;
-    private float player_Speed_Index;
+    public float sliding_Speed = 3f; // Force applied during the dash
+    private float OG_sliding_Speed;
+    private float OG_player_Speed;
     private bool can_Slid;
     private bool can_Slid_Called;
-    public Vector3 movment_Force;
+    public Vector3 movement_Force;
+    private bool isSprinting;
+    public Vector3 MoveDir;
 
     [Header("Jumping settings")]
     public bool can_Jump;
@@ -45,10 +43,10 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
 
     void Awake()
     {
-        player_Speed_Index = walking_Speed;
-        sliding_Speed_Index = sliding_Force;
+        OG_player_Speed = walking_Speed;
+        OG_sliding_Speed = sliding_Speed;
 
-        sliding_Force = sliding_Force + walking_Speed;
+        sliding_Speed = sliding_Speed + walking_Speed;
 
         // Disable the camera for other players
         if (!photonView.IsMine)
@@ -79,10 +77,11 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
         input_Horizontal = Input.GetAxis("Horizontal");
         input_Veritcal = Input.GetAxis("Vertical");
         input_Jump = Input.GetKey(KeyCode.Space);
-        input_sliding = Input.GetKey(KeyCode.LeftControl);
+        input_sliding = Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.C);
+        isSprinting = Input.GetKey(KeyCode.LeftShift);
     }
 
-    void MovePlayer()
+    /*void MovePlayer()
     {
         movment_Force = transform.right * input_Horizontal + transform.forward * input_Veritcal;
         transform.position += movment_Force * walking_Speed * Time.deltaTime;
@@ -117,6 +116,39 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
         {
             rb.linearVelocity = new Vector3(rb.linearVelocity.x, jumping_Force, rb.linearVelocity.z); // jumping force
             can_Jump = false; // one jump
+        }
+    }*/
+
+    void MovePlayer()
+    {
+        MoveDir = new Vector3(input_Horizontal, 0, input_Veritcal);
+
+        if (!input_sliding)
+        {
+            if (isSprinting)
+            {
+                print("Running");
+                rb.AddForce(MoveDir * Running_Speed * Time.deltaTime, ForceMode.Force);
+            }
+            else
+            {
+                print("Walking");
+                rb.AddForce(MoveDir * walking_Speed * Time.deltaTime, ForceMode.Force);
+            }
+        }
+        else
+        {
+
+            if (MoveDir == Vector3.zero && !can_Slid_Called) //ignore canslid called
+            {
+                can_Slid_Called = true; //ignore this
+                can_Slid = false;
+            }
+            else if (MoveDir != Vector3.zero && !can_Slid_Called) //ignore canslide called
+                can_Slid = true;
+
+            Crouching(can_Slid);
+            transform.localScale = new Vector3(transform.localScale.x, 0.5f, transform.localScale.z);
         }
     }
 
@@ -153,21 +185,21 @@ public class PlayerMovment : MonoBehaviourPunCallbacks
     }
 
 
-    void Crouching(bool slidingPerms)
+    void Crouching(bool isSlidingAllowed)
     {
-        if (!slidingPerms)
-            transform.position += movment_Force * crouching_Speed * Time.deltaTime;
+        if (!isSlidingAllowed)
+            rb.AddForce(MoveDir * crouching_Speed * Time.deltaTime, ForceMode.Force); //crouching without sliding
 
-        if (sliding_Force < walking_Speed) // this is the main crouching system that works
+        if (sliding_Speed < walking_Speed) // this is the main crouching system that works
         {
-            transform.position += movment_Force * crouching_Speed * Time.deltaTime;
-            slidingPerms = false;
+            rb.AddForce(MoveDir * crouching_Speed * Time.deltaTime, ForceMode.Force); //crouching without sliding
+            isSlidingAllowed = false;
         }
 
-        if (slidingPerms) // this needs to be work on due to it wont go down on its own
+        if (isSlidingAllowed) // this needs to be work on due to it wont go down on its own
         {
-            transform.position += movment_Force * sliding_Force * Time.deltaTime;
-            sliding_Force -= Time.deltaTime * 5; // replace latter with animashon curve
+            rb.AddForce(MoveDir * sliding_Speed * Time.deltaTime, ForceMode.Force); //sliding
+            sliding_Speed -= Time.deltaTime * 5; // replace latter with animashon curve
         }
     }
 
