@@ -22,7 +22,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     [SerializeField] private float Slide_Cooldown_Timer = 1f;
 
     private float original_Speed;
-    private Vector3 moveDirection;
+    [SerializeField] private Vector3 moveDirection;
 
     public Transform orientation;
 
@@ -32,6 +32,9 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     public Vector3 ray_Offset_Down;
     public float ray_Distance = 1.2f;
     [SerializeField] private bool isGrounded;
+    public Vector3 ray_Offset_Up;
+    public float ray_Distance_up = 1.2f;
+    [SerializeField] private bool isRoofied;
 
     private bool isCrouching;
 
@@ -53,13 +56,14 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
             HandleInput();
             CheckGrounded();
             MovePlayer();
+            CheckRoofied();
         }
     }
 
     void HandleInput()
     {
-        input_Horizontal = Input.GetAxis("Horizontal");
-        input_Vertical = Input.GetAxis("Vertical");
+        input_Horizontal = Input.GetAxisRaw("Horizontal");
+        input_Vertical = Input.GetAxisRaw("Vertical");
         input_Jump = Input.GetKeyDown(KeyCode.Space);
         input_Crouch = Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.C);
         input_Sprint = Input.GetKey(KeyCode.LeftShift);
@@ -72,6 +76,11 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
 
         isGrounded = Physics.Raycast(origin, direction, ray_Distance, groundLayer);
         Debug.DrawRay(origin, direction * ray_Distance, isGrounded ? Color.green : Color.red);
+    }
+    void CheckRoofied()
+    {
+        isRoofied = Physics.Raycast(transform.position + ray_Offset_Up * transform.localScale.y, Vector3.up, ray_Distance_up, groundLayer);
+        Debug.DrawRay(transform.position + ray_Offset_Up * transform.localScale.y, Vector3.up * ray_Distance, isGrounded ? Color.green : Color.red);
     }
 
     private void FixedUpdate()
@@ -86,11 +95,12 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         Slide_Cooldown_Timer = Mathf.Clamp(Slide_Cooldown_Timer, 0, Slide_Cooldown);
 
         moveDirection = orientation.forward * input_Vertical + orientation.right * input_Horizontal;
+
         if (input_Crouch)
         {
             StartCrouching();
         }
-        else if (Slide_Cooldown_Timer <= 0)
+        else
         {
             StopCrouching();
         }
@@ -109,14 +119,17 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
             isCrouching = true;
             hasPerformedSlide = false;
             transform.localScale = new Vector3(transform.localScale.x, 0.5f, transform.localScale.z);
-            PerformSlideBoost();
-            Slide_Cooldown_Timer = Slide_Cooldown;
+            if (Slide_Cooldown_Timer <= 0)
+            {
+                PerformSlideBoost();
+                Slide_Cooldown_Timer = Slide_Cooldown;
+            }
         }
     }
 
     void StopCrouching()
     {
-        if (isCrouching)
+        if (isCrouching && !isRoofied)
         {
             isCrouching = false;
             transform.localScale = new Vector3(transform.localScale.x, 1f, transform.localScale.z);
@@ -137,6 +150,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         if (isGrounded)
         {
             rb.linearVelocity = new Vector3(rb.linearVelocity.x, jump_Force, rb.linearVelocity.z);
+            //StopCrouching();
         }
     }
 }
