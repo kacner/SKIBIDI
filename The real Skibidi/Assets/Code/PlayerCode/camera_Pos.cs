@@ -1,12 +1,16 @@
+using Photon.Pun;
 using UnityEngine;
 
-public class camera_Pos : MonoBehaviour
+public class camera_Pos : MonoBehaviourPunCallbacks
 {
     public Transform cameraPosition;
 
     // Update is called once per frame
     void Update()
     {
-        transform.position = cameraPosition.position;
+        if (photonView.IsMine)
+        {
+            transform.position = cameraPosition.position;
+        }
     }
 }

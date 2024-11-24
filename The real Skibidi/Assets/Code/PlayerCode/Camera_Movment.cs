@@ -15,7 +15,7 @@ public class Camera_Movment : MonoBehaviourPunCallbacks
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-            Cursor.lockState = CursorLockMode.Locked;
+        Cursor.lockState = CursorLockMode.Locked;
     }
 
     // Update is called once per frame
@@ -33,6 +33,10 @@ public class Camera_Movment : MonoBehaviourPunCallbacks
 
             transform.rotation = Quaternion.Euler(xRotation, yRotation, 0);
             orientation.rotation = Quaternion.Euler(0, yRotation, 0);
+        }
+        else
+        {
+            this.gameObject.SetActive(false);
         }
 
     }

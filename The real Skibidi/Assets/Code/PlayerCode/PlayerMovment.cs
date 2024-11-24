@@ -1,5 +1,6 @@
 using UnityEngine;
 using Photon.Pun;
+using TMPro;
 
 public class PlayerMovement : MonoBehaviourPunCallbacks
 {
@@ -30,14 +31,19 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     public LayerMask groundLayer;
     public Vector3 ray_Offset_Down;
     public float ray_Distance = 1.2f;
-    private bool isGrounded;
+    [SerializeField] private bool isGrounded;
 
     private bool isCrouching;
+
+    [Header("Username")]
+    public TextMeshPro UsernameTextObj;
 
     void Awake()
     {
         original_Speed = walking_Speed;
         rb = GetComponent<Rigidbody>();
+
+        UsernameTextObj.text = PhotonNetwork.NickName;
     }
 
     void Update()
@@ -68,17 +74,23 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         Debug.DrawRay(origin, direction * ray_Distance, isGrounded ? Color.green : Color.red);
     }
 
+    private void FixedUpdate()
+    {
+        if (!isGrounded)
+        rb.AddForce(new Vector3(0, -40f, 0), ForceMode.Acceleration);
+    }
+
     void MovePlayer()
     {
         Slide_Cooldown_Timer -= Time.deltaTime;
         Slide_Cooldown_Timer = Mathf.Clamp(Slide_Cooldown_Timer, 0, Slide_Cooldown);
 
         moveDirection = orientation.forward * input_Vertical + orientation.right * input_Horizontal;
-        if (input_Crouch && Slide_Cooldown_Timer <= 0)
+        if (input_Crouch)
         {
             StartCrouching();
         }
-        else
+        else if (Slide_Cooldown_Timer <= 0)
         {
             StopCrouching();
         }
@@ -98,6 +110,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
             hasPerformedSlide = false;
             transform.localScale = new Vector3(transform.localScale.x, 0.5f, transform.localScale.z);
             PerformSlideBoost();
+            Slide_Cooldown_Timer = Slide_Cooldown;
         }
     }
 
@@ -107,15 +120,14 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         {
             isCrouching = false;
             transform.localScale = new Vector3(transform.localScale.x, 1f, transform.localScale.z);
-            Slide_Cooldown_Timer = Slide_Cooldown;
         }
     }
     void PerformSlideBoost()
     {
         if (!hasPerformedSlide && moveDirection != Vector3.zero) // Only boost if there's movement
         {
-            Vector3 boostedVelocity = rb.velocity * sliding_Multiplier;
-            rb.velocity = new Vector3(boostedVelocity.x, rb.velocity.y, boostedVelocity.z); // Preserve vertical velocity
+            Vector3 boostedVelocity = rb.linearVelocity * sliding_Multiplier;
+            rb.linearVelocity = new Vector3(boostedVelocity.x, rb.linearVelocity.y, boostedVelocity.z); // Preserve vertical velocity
             hasPerformedSlide = true;
         }
     }
@@ -124,7 +136,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     {
         if (isGrounded)
         {
-            rb.velocity = new Vector3(rb.velocity.x, jump_Force, rb.velocity.z);
+            rb.linearVelocity = new Vector3(rb.linearVelocity.x, jump_Force, rb.linearVelocity.z);
         }
     }
 }

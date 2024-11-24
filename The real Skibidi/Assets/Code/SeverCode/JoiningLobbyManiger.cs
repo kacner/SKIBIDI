@@ -5,7 +5,6 @@ using Photon.Pun;
 public class JoiningLobbyManiger : MonoBehaviourPunCallbacks
 {
     [SerializeField] int sceneIndex;
-
     public override void OnEnable()
     {
         PhotonNetwork.AddCallbackTarget(this);
@@ -24,5 +23,4 @@ public class JoiningLobbyManiger : MonoBehaviourPunCallbacks
             PhotonNetwork.LoadLevel(sceneIndex);
         }
     }
-
 }

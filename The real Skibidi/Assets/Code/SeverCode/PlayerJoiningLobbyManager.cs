@@ -11,7 +11,7 @@ public class PlayerJoiningLobbyManager : MonoBehaviour
 
     void CreatePlayer()
     {
-        PhotonNetwork.Instantiate("Player", new Vector3(0, 30, 0), Quaternion.identity); // when player joins add chericter to the world
+        PhotonNetwork.Instantiate("Player", transform.position, Quaternion.identity); // when player joins add chericter to the world
     }
 }
 
