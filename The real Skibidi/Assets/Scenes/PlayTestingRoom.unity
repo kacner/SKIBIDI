@@ -596,6 +596,10 @@ PrefabInstance:
       propertyPath: m_Drag
       value: 8
       objectReference: {fileID: 0}
+    - target: {fileID: 2462786700381751424, guid: c69201a74384f1946afb02767a2b430f, type: 3}
+      propertyPath: m_UseGravity
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2633986507754163036, guid: c69201a74384f1946afb02767a2b430f, type: 3}
       propertyPath: sceneViewId
       value: 1
@@ -605,12 +609,24 @@ PrefabInstance:
       value: Player
       objectReference: {fileID: 0}
     - target: {fileID: 5861808716402476236, guid: c69201a74384f1946afb02767a2b430f, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5861808716402476236, guid: c69201a74384f1946afb02767a2b430f, type: 3}
       propertyPath: jump_Force
-      value: 15
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 5861808716402476236, guid: c69201a74384f1946afb02767a2b430f, type: 3}
+      propertyPath: ray_Distance
+      value: 1.5
       objectReference: {fileID: 0}
     - target: {fileID: 5861808716402476236, guid: c69201a74384f1946afb02767a2b430f, type: 3}
       propertyPath: running_Speed
       value: 115
+      objectReference: {fileID: 0}
+    - target: {fileID: 5861808716402476236, guid: c69201a74384f1946afb02767a2b430f, type: 3}
+      propertyPath: sliding_Speed
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5861808716402476236, guid: c69201a74384f1946afb02767a2b430f, type: 3}
       propertyPath: walking_Speed
@@ -619,6 +635,22 @@ PrefabInstance:
     - target: {fileID: 5861808716402476236, guid: c69201a74384f1946afb02767a2b430f, type: 3}
       propertyPath: crouching_Speed
       value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 5861808716402476236, guid: c69201a74384f1946afb02767a2b430f, type: 3}
+      propertyPath: OG_sliding_Speed
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 5861808716402476236, guid: c69201a74384f1946afb02767a2b430f, type: 3}
+      propertyPath: strafing_Acceleration
+      value: 1.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5861808716402476236, guid: c69201a74384f1946afb02767a2b430f, type: 3}
+      propertyPath: fall_GravityMultiplier
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 7063474954697042596, guid: c69201a74384f1946afb02767a2b430f, type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7278443225752414708, guid: c69201a74384f1946afb02767a2b430f, type: 3}
       propertyPath: sceneViewId

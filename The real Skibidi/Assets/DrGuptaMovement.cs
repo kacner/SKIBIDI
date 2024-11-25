@@ -1,8 +1,9 @@
 using UnityEngine;
 using Photon.Pun;
 using TMPro;
+using System.Collections;
 
-public class PlayerMovement : MonoBehaviourPunCallbacks
+public class DrGuptaMovement : MonoBehaviourPunCallbacks
 {
     private Rigidbody rb;
 
@@ -44,8 +45,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     {
         sliding_Speed = OG_sliding_Speed;
         rb = GetComponent<Rigidbody>();
-
-        UsernameTextObj.text = PhotonNetwork.NickName;
+        //UsernameTextObj.text = PhotonNetwork.NickName;
     }
 
     void Update()
@@ -76,6 +76,7 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         isGrounded = Physics.Raycast(origin, direction, ray_Distance, groundLayer);
         Debug.DrawRay(origin, direction * ray_Distance, isGrounded ? Color.green : Color.red);
     }
+
     void CheckRoofied()
     {
         isRoofied = Physics.Raycast(transform.position + ray_Offset_Up * transform.localScale.y, Vector3.up, ray_Distance_up, groundLayer);
@@ -107,14 +108,9 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
         Slide_Cooldown_Timer -= Time.deltaTime;
         Slide_Cooldown_Timer = Mathf.Clamp(Slide_Cooldown_Timer, 0, Slide_Cooldown);
 
+        Vector3 currentVelocity = rb.velocity;
 
-        if (isGrounded)
-        {
-            moveDirection = orientation.forward * input_Vertical + orientation.right * input_Horizontal;
-        }
-
-        float speed = isCrouching ? crouching_Speed : (input_Sprint ? running_Speed : walking_Speed);
-
+        // Handle crouching behavior
         if (input_Crouch)
         {
             StartCrouching();
@@ -124,8 +120,19 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
             StopCrouching();
         }
 
-        rb.AddForce(moveDirection.normalized * speed * Time.deltaTime, ForceMode.VelocityChange);
+        // Calculate movement input
+        Vector2 input = new Vector2(input_Horizontal, input_Vertical);
 
+        // Calculate friction to adjust velocity
+        currentVelocity = CalculateFriction(currentVelocity);
+
+        // Calculate movement and apply velocity based on input
+        currentVelocity = CalculateMovement(input, currentVelocity);
+
+        // Apply the calculated velocity to the Rigidbody
+        rb.velocity = currentVelocity;
+
+        // Jumping logic
         if (input_Jump)
             Jump();
     }
@@ -154,12 +161,12 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
             hasPreformedSlideBoost = false;
         }
     }
+
     void PerformSlideBoost()
     {
         if (moveDirection != Vector3.zero && !hasPreformedSlideBoost)
         {
             rb.AddForce(moveDirection * sliding_Speed, ForceMode.Force);
-            print("Boosted");
             hasPreformedSlideBoost = true;
         }
     }
@@ -168,8 +175,48 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
     {
         if (isGrounded)
         {
-            rb.linearVelocity = new Vector3(rb.linearVelocity.x, jump_Force, rb.linearVelocity.z);
-            //StopCrouching();
+            Vector3 jumpVelocity = CalculateJumpVelocity(rb.velocity.y);
+            rb.velocity = new Vector3(rb.velocity.x, jumpVelocity.y, rb.velocity.z);
         }
+    }
+
+    private Vector3 CalculateFriction(Vector3 currentVelocity)
+    {
+        float speed = currentVelocity.magnitude;
+
+        if (!isGrounded || input_Jump || speed == 0f)
+            return currentVelocity;
+
+        float drop = speed * 0.1f * Time.deltaTime; // Example friction value of 0.1
+        return currentVelocity * (Mathf.Max(speed - drop, 0f) / speed);
+    }
+
+    private Vector3 CalculateMovement(Vector2 input, Vector3 currentVelocity)
+    {
+
+        float acceleration = isGrounded ? 5f : 2.5f; // Example values for ground and air acceleration
+        float maxSpeed = isGrounded ? 7f : 5f; // Example values for ground and air speed
+
+        Vector3 cameraYawRotation = new Vector3(0f, orientation.transform.rotation.eulerAngles.y, 0f);
+        Vector3 desiredVelocity = Quaternion.Euler(cameraYawRotation) * new Vector3(input.x, 0f, input.y) * acceleration * Time.deltaTime;
+
+        Vector3 horizontalCurrentVelocity = new Vector3(currentVelocity.x, 0f, currentVelocity.z);
+        float speedFactor = Mathf.Max(0f, 1 - (horizontalCurrentVelocity.magnitude / maxSpeed));
+        float alignmentFactor = Vector3.Dot(horizontalCurrentVelocity, desiredVelocity);
+        Vector3 blendedVelocity = Vector3.Lerp(desiredVelocity, desiredVelocity * speedFactor, alignmentFactor);
+
+        blendedVelocity.y = CalculateJumpVelocity(currentVelocity.y).y;
+
+        return blendedVelocity;
+    }
+
+    public Vector3 CalculateJumpVelocity(float currentYVelocity)
+    {
+        Vector3 jumpVelocity = Vector3.zero;
+
+        if (input_Jump && isGrounded)
+            jumpVelocity = new Vector3(0f, jump_Force - currentYVelocity, 0f);
+
+        return jumpVelocity;
     }
 }
