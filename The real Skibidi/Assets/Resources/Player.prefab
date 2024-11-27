@@ -390,8 +390,9 @@ GameObject:
   - component: {fileID: 1793497624947264618}
   - component: {fileID: 4008702920290352092}
   - component: {fileID: 2547876913150797520}
+  - component: {fileID: 8943986893609122094}
   m_Layer: 0
-  m_Name: Text (TMP) (1)
+  m_Name: Username
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -508,7 +509,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 18
+  m_fontSize: 18.05
   m_fontSizeBase: 15.6
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -546,7 +547,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 2.982529}
+  m_margin: {x: -35.89475, y: 0, z: -36.083908, w: 2.982529}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   _SortingLayer: 0
@@ -555,6 +556,18 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_renderer: {fileID: 4008702920290352092}
   m_maskType: 0
+--- !u!114 &8943986893609122094
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5306019025679936139}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e7658e977fc17d2419eb44b4fb952df3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7778089245482804843
 GameObject:
   m_ObjectHideFlags: 0

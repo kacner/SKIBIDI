@@ -3,45 +3,45 @@ using UnityEngine;
 
 public class FacePlayer : MonoBehaviour
 {
-    private Transform localPlayerCamera;
+    private Transform localCamera;
+
+    void Start()
+    {
+        FindLocalCamera();
+    }
 
     void Update()
     {
-        if (localPlayerCamera == null)
+        if (localCamera != null)
         {
-            FindLocalPlayerCamera();
-        }
-
-        if (localPlayerCamera != null)
-        {
-            Vector3 directionToFace = localPlayerCamera.position - transform.position;
-
-            directionToFace.y = 0;
-
-            Quaternion targetRotation = Quaternion.LookRotation(-directionToFace);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 5f);
-            print("calcuilatingdistance");
-        }
-    }
-
-    void FindLocalPlayerCamera()
-    {
-        if (PhotonNetwork.IsConnected)
-        {
-            foreach (var photonView in FindObjectsOfType<PhotonView>())
-            {
-                if (photonView.IsMine)
-                {
-                    localPlayerCamera = photonView.gameObject.GetComponentInChildren<Camera>().transform;
-                    Debug.Log("Local player's camera found.");
-                    return;
-                }
-            }
+            FaceCamera();
         }
         else
         {
-            localPlayerCamera = Camera.main?.transform;
-            Debug.Log("Using main camera for single-player.");
+            FindLocalCamera();
         }
+    }
+
+    private void FindLocalCamera()
+    {
+        localCamera = Camera.main?.transform;
+
+        if (localCamera != null)
+        {
+            Debug.Log("Local camera found for client.");
+        }
+        else
+        {
+            Debug.LogWarning("Local camera not found. Retrying...");
+        }
+    }
+
+    private void FaceCamera()
+    {
+        Vector3 directionToFace = localCamera.position - transform.position;
+
+        directionToFace.y = 0;
+
+        transform.rotation = Quaternion.LookRotation(-directionToFace);
     }
 }

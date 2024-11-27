@@ -1,6 +1,7 @@
 ﻿using Photon.Pun;
 using TMPro;
 using UnityEngine;
+using ExitGames.Client.Photon;
 
 namespace Q3Movement
 {
@@ -78,7 +79,6 @@ namespace Q3Movement
             if (photonView.IsMine)
             {
                 OG_sliding_Speed = sliding_Speed;
-                UsernameTextObj.text = PhotonNetwork.NickName;
                 m_Tran = transform;
                 m_Character = GetComponent<CharacterController>();
 
@@ -87,13 +87,23 @@ namespace Q3Movement
 
                 m_CamTran = m_Camera.transform;
                 m_MouseLook.Init(m_Tran, m_CamTran, photonView);
+
+                PhotonNetwork.LocalPlayer.SetCustomProperties(new Hashtable() { { "Username", PhotonNetwork.NickName } });
+
+                UsernameTextObj.text = PhotonNetwork.NickName;
             }
             else
+            {
                 m_Camera.gameObject.SetActive(false);
+                string otherPlayerUsername = UsernameManager.Instance.GetUsername(photonView);
+
+                UsernameTextObj.text = otherPlayerUsername;
+            }
         }
 
         private void Update()
         {
+            print(PhotonNetwork.NickName);
             if (photonView.IsMine)
             {
                 CheckRoofied();

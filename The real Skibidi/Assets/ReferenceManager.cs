@@ -1,4 +1,3 @@
-using Photon.Pun.Demo.PunBasics;
 using UnityEngine;
 
 public class ReferenceManager : MonoBehaviour
