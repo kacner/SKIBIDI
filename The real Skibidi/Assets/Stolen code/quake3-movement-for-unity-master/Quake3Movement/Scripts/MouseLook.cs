@@ -2,11 +2,8 @@
 using UnityEngine;
 using Photon.Pun;
 
-namespace Q3Movement
+namespace Movement
 {
-    /// <summary>
-    /// Custom script based on the version from the Standard Assets.
-    /// </summary>
     [Serializable]
     public class MouseLook
     {
