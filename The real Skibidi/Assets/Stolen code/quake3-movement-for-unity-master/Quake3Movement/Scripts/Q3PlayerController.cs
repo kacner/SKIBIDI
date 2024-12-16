@@ -29,6 +29,11 @@ namespace Q3Movement
         [Header("Aiming")]
         [SerializeField] private Camera m_Camera;
         [SerializeField] private MouseLook m_MouseLook = new MouseLook();
+        public float normalFOV = 60f;    // Default FOV
+        public float zoomedFOV = 40f;    // FOV when right-click is held
+        public float transitionSpeed = 5f; // Speed of FOV transition
+
+        private float targetFOV;         // Current target FOV
 
         [Header("Movement")]
         [SerializeField] private float m_Friction = 6;
@@ -121,6 +126,18 @@ namespace Q3Movement
                 {
                     AirMove();
                 }
+
+                if (Input.GetMouseButton(1)) // Right-click is held
+                {
+                    targetFOV = zoomedFOV;
+                }
+                else // Right-click is released
+                {
+                    targetFOV = normalFOV;
+                }
+
+                // Smoothly interpolate the FOV to the target value
+                m_Camera.fieldOfView = Mathf.Lerp(m_Camera.fieldOfView, targetFOV, transitionSpeed * Time.deltaTime);
 
                 // Rotate the character and camera.
                 m_MouseLook.LookRotation(m_Tran, m_CamTran);
