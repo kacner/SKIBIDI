@@ -1,7 +1,9 @@
 ﻿using Photon.Pun;
 using TMPro;
 using UnityEngine;
-using ExitGames.Client.Photon;
+using System.Collections;
+using System.Runtime.InteropServices;
+using System;
 
 namespace Movement
 {
@@ -79,6 +81,14 @@ namespace Movement
         public Mesh Headless;
         public Mesh NotHeadless;
 
+        [DllImport("user32.dll")]
+        private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+        private const int SW_MINIMIZE = 6;
+
+        // Import the function to get the process window handle
+        [DllImport("user32.dll")]
+        private static extern IntPtr GetActiveWindow();
 
         private void Awake()
         {
@@ -94,7 +104,7 @@ namespace Movement
                 m_CamTran = m_Camera.transform;
                 m_MouseLook.Init(m_Tran, m_CamTran, photonView);
 
-                PhotonNetwork.LocalPlayer.SetCustomProperties(new Hashtable() { { "Username", PhotonNetwork.NickName } });
+                PhotonNetwork.LocalPlayer.SetCustomProperties(new ExitGames.Client.Photon.Hashtable() { { "Username", PhotonNetwork.NickName } });
 
                 UsernameTextObj.text = PhotonNetwork.NickName;
 
@@ -363,6 +373,34 @@ namespace Movement
 
             Color rayColor = isRoofied ? Color.red : Color.green;
             Debug.DrawRay(origin, direction * ray_Distance_up, rayColor);
+        }
+        public IEnumerator die()
+        {
+            Vector3 iniScale = transform.localScale;
+            float timer = 0;
+            float duration = 0.5f;
+            while (timer < duration)
+            {
+                timer += Time.deltaTime;
+
+                transform.localScale = Vector3.Lerp(iniScale, new Vector3(0.01f, 0.01f, 0.01f), timer / duration);
+
+                yield return null;
+            }
+
+            transform.localScale = new Vector3(0.01f, 0.01f, 0.01f);
+            yield return new WaitForSeconds(0.2f);
+            timer = 0;
+            while (timer < duration)
+            {
+                timer += Time.deltaTime;
+
+                transform.localScale = Vector3.Lerp(new Vector3(0.01f, 0.01f, 0.01f), iniScale, timer / duration);
+
+                yield return null;
+            }
+
+            transform.localScale = iniScale;
         }
     }
 }
