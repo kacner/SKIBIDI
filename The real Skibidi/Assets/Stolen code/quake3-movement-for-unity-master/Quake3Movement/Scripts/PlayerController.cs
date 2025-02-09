@@ -4,6 +4,7 @@ using UnityEngine;
 using System.Collections;
 using System.Runtime.InteropServices;
 using System;
+using UnityEngine.Video;
 
 namespace Movement
 {
@@ -46,10 +47,12 @@ namespace Movement
         [SerializeField] private MovementSettings m_AirSettings = new MovementSettings(7, 2, 2);
         [SerializeField] private MovementSettings m_StrafeSettings = new MovementSettings(1, 50, 50);
         [Header("Crouch / Dash")]
+        [SerializeField] private bool EnableSlide = false;
         [SerializeField] private float sliding_Speed = 5;
         [SerializeField] private float Slide_Cooldown = 1f;
         [SerializeField] private float Slide_Cooldown_Timer = 1f;
         [SerializeField] private Vector3 moveDirection;
+        [SerializeField] private float crouchTransitionDuration = 0.3f;
         private float OG_sliding_Speed;
         private bool input_Crouch;
         private bool isCrouching;
@@ -300,7 +303,6 @@ namespace Movement
             float speed = vec.magnitude;
             float drop = 0;
 
-            //friction if gruonded.
             if (m_Character.isGrounded)
             {
                 float control = speed < m_GroundSettings.Deceleration ? m_GroundSettings.Deceleration : speed;
@@ -320,7 +322,6 @@ namespace Movement
             }
 
             m_PlayerVelocity.x *= newSpeed;
-            // playerVelocity.y *= newSpeed;
             m_PlayerVelocity.z *= newSpeed;
         }
         private void Accelerate(Vector3 targetDir, float targetSpeed, float accel)
@@ -347,8 +348,8 @@ namespace Movement
             if (!isCrouching)
             {
                 isCrouching = true;
-                transform.localScale = new Vector3(transform.localScale.x, 0.5f, transform.localScale.z);
-                if (Slide_Cooldown_Timer <= 0 && m_Character.isGrounded)
+                StartCoroutine( LerpScale(new Vector3(transform.localScale.x, 0.5f, transform.localScale.z)));
+                if (Slide_Cooldown_Timer <= 0 && m_Character.isGrounded && EnableSlide)
                 {
                     sliding_Speed = OG_sliding_Speed;
                     Slide_Cooldown_Timer = Slide_Cooldown;
@@ -361,8 +362,25 @@ namespace Movement
             if (isCrouching && !isRoofied)
             {
                 isCrouching = false;
-                transform.localScale = new Vector3(transform.localScale.x, 1f, transform.localScale.z);
+                StartCoroutine(LerpScale(new Vector3(transform.localScale.x, 1, transform.localScale.z)));
             }
+        }
+
+        IEnumerator LerpScale(Vector3 targetScale)
+        {
+            float duration = crouchTransitionDuration;
+            float timer = 0;
+
+            while (timer < duration)
+            {
+                timer += Time.deltaTime;
+
+                transform.localScale = Vector3.Lerp(transform.localScale, targetScale, timer / duration);
+
+                yield return null;
+            }
+
+            transform.localScale = targetScale;
         }
         void CheckRoofied()
         {
