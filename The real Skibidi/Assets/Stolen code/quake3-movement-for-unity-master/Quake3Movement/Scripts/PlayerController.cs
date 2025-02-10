@@ -113,7 +113,7 @@ namespace Movement
 
         private void Update()
         {
-            print(Mathf.Abs(m_PlayerVelocity.z) + Mathf.Abs(m_PlayerVelocity.x) + ": velocity");
+            //print(Mathf.Abs(m_PlayerVelocity.z) + Mathf.Abs(m_PlayerVelocity.x) + ": velocity");
             if (photonView.IsMine)
             {
 

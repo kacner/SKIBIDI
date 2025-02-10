@@ -3960,6 +3960,37 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a54bb0fbf93b09440a77975415674e2a, type: 3}
+--- !u!1 &732293416
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 732293417}
+  m_Layer: 6
+  m_Name: Shooting point
+  m_TagString: Untagged
+  m_Icon: {fileID: -964228994112308473, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &732293417
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 732293416}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.427, y: 1.19, z: 1.968}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6538540493057586295}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &737891883 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: a54bb0fbf93b09440a77975415674e2a, type: 3}
@@ -19781,18 +19812,21 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3730952686587097674}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3d3a501b838c0284f84126f762249d09, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   round: {fileID: 0}
-  firePoint: {fileID: 0}
+  firePoint: {fileID: 732293417}
+  playerCamera: {fileID: 7894889811080222739}
+  raycastDistance: 100
+  interactableLayer:
+    serializedVersion: 2
+    m_Bits: 0
   fireRate: 0.5
   reloadTime: 2
   maxAmmunition: 25
-  canShoot: 0
-  Shooting: 0
 --- !u!33 &2102627423281774013
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -20259,6 +20293,7 @@ GameObject:
   - component: {fileID: 719103257579394727}
   - component: {fileID: 6928640643411488930}
   - component: {fileID: 5819796333051023559}
+  - component: {fileID: 6928640643411488931}
   m_Layer: 6
   m_Name: Player
   m_TagString: Untagged
@@ -30409,6 +30444,7 @@ Transform:
   - {fileID: 1305581475248769243}
   - {fileID: 2778104452016998274}
   - {fileID: 5302039723879873317}
+  - {fileID: 732293417}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6551238392176655304
@@ -30563,6 +30599,18 @@ MonoBehaviour:
     customString: Use space to jump
     requiredTag: Carly
     textCanvasGroup: {fileID: 0}
+--- !u!114 &6928640643411488931
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3730952686587097674}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 18117185871526343bee17d705b3e93b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &6935145060391211960
 MonoBehaviour:
   m_ObjectHideFlags: 0
