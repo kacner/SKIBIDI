@@ -2,9 +2,7 @@
 using TMPro;
 using UnityEngine;
 using System.Collections;
-using System.Runtime.InteropServices;
-using System;
-using UnityEngine.Video;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Movement
 {
@@ -39,9 +37,7 @@ namespace Movement
         [SerializeField] private float m_Friction = 6;
         [SerializeField] private float m_Gravity = 20;
         [SerializeField] private float m_JumpForce = 8;
-        [Tooltip("Automatically jump when holding jump button")]
         [SerializeField] private bool m_AutoBunnyHop = false;
-        [Tooltip("How precise air control is")]
         [SerializeField] private float m_AirControl = 0.3f;
         [SerializeField] private MovementSettings m_GroundSettings = new MovementSettings(7, 14, 10);
         [SerializeField] private MovementSettings m_AirSettings = new MovementSettings(7, 2, 2);
@@ -56,6 +52,7 @@ namespace Movement
         private float OG_sliding_Speed;
         private bool input_Crouch;
         private bool isCrouching;
+        [SerializeField] private float CrouchSpeedFactor = 0.5f;
         [Header("RoofCheck")]
         [SerializeField] private Vector3 ray_Offset_Up;
         [SerializeField] private float ray_Distance_up = 1.2f;
@@ -83,15 +80,6 @@ namespace Movement
         public MeshFilter meshfilter;
         public Mesh Headless;
         public Mesh NotHeadless;
-
-        [DllImport("user32.dll")]
-        private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
-
-        private const int SW_MINIMIZE = 6;
-
-        // Import the function to get the process window handle
-        [DllImport("user32.dll")]
-        private static extern IntPtr GetActiveWindow();
 
         private void Awake()
         {
@@ -125,7 +113,7 @@ namespace Movement
 
         private void Update()
         {
-            print(PhotonNetwork.NickName);
+            print(Mathf.Abs(m_PlayerVelocity.z) + Mathf.Abs(m_PlayerVelocity.x) + ": velocity");
             if (photonView.IsMine)
             {
 
@@ -282,7 +270,11 @@ namespace Movement
             m_MoveDirectionNorm = wishdir;
 
             var wishspeed = wishdir.magnitude;
+            if (!isCrouching)
             wishspeed *= m_GroundSettings.MaxSpeed;
+            else
+            wishspeed *= m_GroundSettings.MaxSpeed * CrouchSpeedFactor;
+
 
             Accelerate(wishdir, wishspeed, m_GroundSettings.Acceleration);
 
