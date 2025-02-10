@@ -3984,12 +3984,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 732293416}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.427, y: 1.19, z: 1.968}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: -0, y: 0.99997735, z: 0, w: 0.0067335423}
+  m_LocalPosition: {x: -0.012, y: 1.624, z: -7.349}
+  m_LocalScale: {x: -9.3222685, y: 9.322271, z: 9.3222685}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 6538540493057586295}
+  m_Father: {fileID: 543450652765198004}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &737891883 stripped
 Transform:
@@ -6635,7 +6635,7 @@ ParticleSystem:
   emitterVelocityMode: 1
   looping: 0
   prewarm: 0
-  playOnAwake: 1
+  playOnAwake: 0
   useUnscaledTime: 0
   autoRandomSeed: 1
   startDelay:
@@ -11952,7 +11952,7 @@ ParticleSystem:
   emitterVelocityMode: 0
   looping: 0
   prewarm: 0
-  playOnAwake: 1
+  playOnAwake: 0
   useUnscaledTime: 0
   autoRandomSeed: 1
   startDelay:
@@ -19272,6 +19272,7 @@ Transform:
   m_LocalScale: {x: -0.10727002, y: 0.10727, z: 0.10727002}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 732293417}
   - {fileID: 1553913030}
   - {fileID: 1420367172}
   - {fileID: 1303637193}
@@ -19343,7 +19344,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 543450652765198004}
-  - component: {fileID: 919132149049084943}
+  - component: {fileID: 919132149049084944}
   m_Layer: 0
   m_Name: K-Pist
   m_TagString: Untagged
@@ -19351,7 +19352,7 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &919132149049084943
+--- !u!114 &919132149049084944
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -19360,13 +19361,28 @@ MonoBehaviour:
   m_GameObject: {fileID: 919132149049084942}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 18143f8693f62664b8af54dd9c3413e7, type: 3}
+  m_Script: {fileID: 11500000, guid: 3d3a501b838c0284f84126f762249d09, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  round: {fileID: 0}
+  firePoint: {fileID: 732293417}
+  playerCamera: {fileID: 7894889811080222739}
+  hittingSparks: {fileID: 100002, guid: 00fedc70b62a31e448e8ccc298257b56, type: 3}
+  playerHitMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  raycastDistance: 100
+  fireRate: 0.2
+  reloadTime: 2
+  maxAmmunition: 10
   muzzleflash: {fileID: 1420367174}
-  muzzleSpark: {fileID: 3910611447740299535}
-  muzzlesmoke: {fileID: 5814736780409539052}
   light: {fileID: 1303637195}
+  trail: {fileID: 9008128420236410051, guid: 6dc975bc7a9f3724eb9435507572025b, type: 3}
+  bulletHolePrefab: {fileID: 5891031121118321821, guid: b8af076005307c7448c64d87bc054a01, type: 3}
+  BulletHoles:
+  - {fileID: 21300000, guid: bbf572ff5c8788249ad3f8f296832ad3, type: 3}
+  - {fileID: 21300000, guid: e674eeeffe4000d428745052c68f78b2, type: 3}
+  - {fileID: 21300000, guid: f05a39ce30dd8e44fb22ee12459a4c56, type: 3}
 --- !u!23 &976977749989884122
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -19820,13 +19836,19 @@ MonoBehaviour:
   round: {fileID: 0}
   firePoint: {fileID: 732293417}
   playerCamera: {fileID: 7894889811080222739}
-  raycastDistance: 100
-  interactableLayer:
+  hittingSparks: {fileID: 0}
+  playerHitMask:
     serializedVersion: 2
     m_Bits: 0
+  raycastDistance: 100
   fireRate: 0.5
   reloadTime: 2
   maxAmmunition: 25
+  muzzleflash: {fileID: 0}
+  light: {fileID: 0}
+  trail: {fileID: 0}
+  bulletHolePrefab: {fileID: 0}
+  BulletHoles: []
 --- !u!33 &2102627423281774013
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -20366,7 +20388,7 @@ ParticleSystem:
   emitterVelocityMode: 0
   looping: 0
   prewarm: 0
-  playOnAwake: 1
+  playOnAwake: 0
   useUnscaledTime: 0
   autoRandomSeed: 1
   startDelay:
@@ -20909,7 +20931,7 @@ ParticleSystem:
     serializedVersion: 6
     enabled: 1
     type: 4
-    angle: 27.6
+    angle: 17.63
     length: 5
     boxThickness: {x: 0, y: 0, z: 0}
     radiusThickness: 0
@@ -21224,7 +21246,7 @@ ParticleSystem:
       countCurve:
         serializedVersion: 2
         minMaxState: 0
-        scalar: 3
+        scalar: 1
         minScalar: 15
         maxCurve:
           serializedVersion: 2
@@ -25571,7 +25593,7 @@ ParticleSystem:
   emitterVelocityMode: 0
   looping: 0
   prewarm: 0
-  playOnAwake: 1
+  playOnAwake: 0
   useUnscaledTime: 0
   autoRandomSeed: 1
   startDelay:
@@ -30383,7 +30405,7 @@ RectTransform:
   m_GameObject: {fileID: 3403943882293439445}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.17, y: 0.17, z: 0.17}
+  m_LocalScale: {x: 0.0633182, y: 0.0633182, z: 0.0633182}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 5302039723879873317}
@@ -30444,7 +30466,6 @@ Transform:
   - {fileID: 1305581475248769243}
   - {fileID: 2778104452016998274}
   - {fileID: 5302039723879873317}
-  - {fileID: 732293417}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6551238392176655304

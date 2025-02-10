@@ -1,6 +1,9 @@
 using Photon.Pun;
+using System;
 using System.Collections;
+using UnityEditor;
 using UnityEngine;
+using static UnityEditor.PlayerSettings;
 
 public class PlayerWeapon : MonoBehaviourPunCallbacks
 {
@@ -26,6 +29,11 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
     private bool isShooting;
     private bool reloadInput;
 
+    [SerializeField] private ParticleSystem muzzleflash;
+    [SerializeField] private Light light;
+    [SerializeField] private GameObject trail;
+    [SerializeField] private GameObject bulletHolePrefab;
+    [SerializeField] private Sprite[] BulletHoles;
     void Start()
     {
         ammunitionAmount = maxAmmunition;
@@ -85,8 +93,35 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
 
         Debug.Log($"Bullet Amount: {ammunitionAmount}");
 
+        muzzleflash.Play();
+        StartCoroutine(Light());
+
         ShootRaycast();
         StartCoroutine(FireRateCooldown());
+    }
+    IEnumerator Light()
+    {
+        light.enabled = true;
+        yield return new WaitForSeconds(0.1f);
+        light.enabled = false;
+    }
+
+
+    private IEnumerator TrailAnimation(RaycastHit hit)
+    {
+        GameObject SpawnedTrail = Instantiate(trail, firePoint.position, Quaternion.identity);
+
+        float timer = 0;
+        float duration = 0.1f;
+       
+        while (timer < duration)
+        {
+            timer += Time.deltaTime;
+            SpawnedTrail.transform.position = Vector3.Lerp(SpawnedTrail.transform.position, hit.point, timer / duration);
+            yield return null;
+        }
+        PlayerHitDetect(hit.point, hit.normal);
+        Destroy(SpawnedTrail);
     }
 
     void ShootRaycast()
@@ -104,18 +139,31 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
         if (Physics.Raycast(firePoint.position, shootDirection, out RaycastHit hit, raycastDistance, playerHitMask))
         {
             Debug.DrawLine(firePoint.position, hit.point, Color.red, 1f);
-            PlayerHitDetect(hit.collider.gameObject);
         }
         else
         {
             Debug.DrawLine(firePoint.position, firePoint.position + shootDirection * raycastDistance, Color.yellow, 1f);
         }
+        StartCoroutine(TrailAnimation(hit));
     }
 
-    void PlayerHitDetect(GameObject hitObject)
+    IEnumerator PlayerHitDetect(Vector3 pos, Vector3 normal)
     {
-        Debug.Log("Hit object: " + hitObject.name);
-        photonView.RPC("RPC_InteractWithObject", RpcTarget.All, hitObject.name);
+        Quaternion hitRotation = Quaternion.LookRotation(normal);
+        GameObject spark = Instantiate(hittingSparks, pos, Quaternion.identity);
+
+        CreateBulletHole(pos);
+
+        yield return new WaitForSeconds(0.1f);
+        Destroy(spark);
+    }
+
+    private void CreateBulletHole(Vector3 pos)
+    {
+        GameObject decal = Instantiate(bulletHolePrefab, pos, Quaternion.identity);
+        SpriteRenderer spriteRenderer = decal.GetComponent<SpriteRenderer>();
+        int rnd = UnityEngine.Random.RandomRange(0, BulletHoles.Length);
+        spriteRenderer.sprite = BulletHoles[rnd];
     }
 
     private IEnumerator FireRateCooldown()
