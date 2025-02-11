@@ -1,3 +1,4 @@
+using Movement;
 using Photon.Pun;
 using System.Collections;
 using UnityEngine;
@@ -5,6 +6,7 @@ using UnityEngine;
 public class PlayerWeapon : MonoBehaviourPunCallbacks
 {
     [Header("Setup")]
+    [SerializeField] public PlayerController playerController;
     [SerializeField] private Transform firePoint;
     [SerializeField] private Camera playerCamera;
     [SerializeField] private GameObject hittingSparks;
@@ -13,10 +15,11 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
     [Space]
 
     [Header("Weapond Settings")]
-    [SerializeField] private float raycastDistance = 100f;
-    [SerializeField] private float fireRate = 0.2f;
-    [SerializeField] private float reloadTime = 2f;
-    [SerializeField] private int maxAmmunition = 10;
+    [SerializeField] private float raycastDistance;
+    [SerializeField] private float fireRate;
+    [SerializeField] private float reloadTime;
+    [SerializeField] private int maxAmmunition;
+    [SerializeField] public float bloomAngleMaxAmout;
 
     private int ammunitionAmount;
     private bool canShoot = true;
@@ -87,8 +90,6 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
         ammunitionAmount--;
         canShoot = false;
 
-        //Debug.Log($"Bullet Amount: {ammunitionAmount}");
-
         muzzleflash.Play();
         StartCoroutine(Light());
 
@@ -132,6 +133,23 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
 
         Vector3 shootDirection = (targetPoint - firePoint.position).normalized;
 
+        // Bloom Recoil - Adds inaccuracy based on movement
+        float bloomAngle = 0f; // Default no bloom
+        if (playerController.m_MoveInput.x != 0 || playerController.m_MoveInput.y != 0)
+        {
+            bloomAngle = bloomAngleMaxAmout * playerController.m_PlayerVelocity.magnitude / 2; // Increase bloom when moving
+            Debug.LogWarning(bloomAngle);
+
+            bloomAngle += Random.Range(-bloomAngle, bloomAngle); // Randomized bloom effect
+            Quaternion bloomRotation = Quaternion.Euler(Random.Range(-bloomAngle, bloomAngle), 0, Random.Range(-bloomAngle, bloomAngle));
+            shootDirection = bloomRotation * shootDirection; // Apply bloom
+        }
+        else
+        {
+            // add bloom to standing
+        }
+
+
         if (Physics.Raycast(firePoint.position, shootDirection, out RaycastHit hit, raycastDistance, playerHitMask))
         {
             Debug.DrawLine(firePoint.position, hit.point, Color.red, 1f);
@@ -140,11 +158,13 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
         {
             Debug.DrawLine(firePoint.position, firePoint.position + shootDirection * raycastDistance, Color.yellow, 1f);
         }
+
         StartCoroutine(TrailAnimation(hit));
         recoil.StartRecoil();
         camerashake.StartShake();
         animation.Play();
     }
+
 
     IEnumerator HitSpark(Vector3 pos, Vector3 normal)
     {

@@ -6,8 +6,8 @@ public class PlayerMovement : MonoBehaviourPunCallbacks
 {
     private Rigidbody rb;
 
-    private float input_Horizontal;
-    private float input_Vertical;
+    public float input_Horizontal;
+    public float input_Vertical;
     private bool input_Jump;
     private bool input_Crouch;
     private bool input_Sprint;

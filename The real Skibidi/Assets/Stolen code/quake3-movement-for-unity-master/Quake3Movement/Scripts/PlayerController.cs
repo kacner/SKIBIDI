@@ -62,13 +62,13 @@ namespace Movement
         public float Speed { get { return m_Character.velocity.magnitude; } }
 
         private CharacterController m_Character;
-        private Vector3 m_PlayerVelocity = Vector3.zero;
+        [HideInInspector] public Vector3 m_PlayerVelocity = Vector3.zero;
 
         private bool m_JumpQueued = false;
 
         private float m_PlayerFriction = 0;
 
-        private Vector3 m_MoveInput;
+        public Vector3 m_MoveInput;
         private Transform m_Tran;
         private Transform m_CamTran;
 
