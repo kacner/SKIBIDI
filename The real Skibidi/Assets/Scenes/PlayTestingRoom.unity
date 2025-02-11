@@ -24125,6 +24125,7 @@ GameObject:
   - component: {fileID: 919132149049084945}
   - component: {fileID: 919132149049084946}
   - component: {fileID: 919132149049084947}
+  - component: {fileID: 919132149049084948}
   m_Layer: 0
   m_Name: K-Pist
   m_TagString: Untagged
@@ -24154,6 +24155,8 @@ MonoBehaviour:
   fireRate: 0.1
   reloadTime: 2
   maxAmmunition: 100
+  bloomAngleMaxAmout: 0.9
+  MaxVelocityForBloom: 20
   muzzleflash: {fileID: 1420367174}
   light: {fileID: 1303637195}
   trail: {fileID: 9008128420236410051, guid: 6dc975bc7a9f3724eb9435507572025b, type: 3}
@@ -24218,6 +24221,27 @@ Animation:
   m_AnimatePhysics: 0
   m_UpdateMode: 0
   m_CullingType: 0
+--- !u!114 &919132149049084948
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 919132149049084942}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 773f81bd88cff55478ef13eda88009ca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  recoilX: 2
+  recoilY: 2
+  recoilZ: 0.35
+  snapiness: 6
+  returnSpeed: 2
+  randomRecoilX: 0.5
+  randomRecoilY: 0.5
+  maxRecoilShots: 10
+  patternScale: 1
 --- !u!23 &976977749989884122
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -24758,6 +24782,8 @@ MonoBehaviour:
   ray_Distance_up: 1.4
   isRoofied: 0
   UsernameTextObj: {fileID: 2547876912654365393}
+  m_PlayerVelocity: {x: 0, y: 0, z: 0}
+  m_MoveInput: {x: 0, y: 0, z: 0}
   meshfilter: {fileID: 3469287837023173711}
   Headless: {fileID: -4818002257964042369, guid: f27fe5798113ff14aa0123446b313d2b, type: 3}
   NotHeadless: {fileID: 2106927320424640176, guid: 14e1193e088ac6b418ebb1f8ab09fce8, type: 3}

@@ -6,9 +6,8 @@ using UnityEngine;
 public class PlayerWeapon : MonoBehaviourPunCallbacks
 {
     [Header("Setup")]
-    [SerializeField] public PlayerController playerController;
     [SerializeField] private Transform firePoint;
-    [SerializeField] private Camera playerCamera;
+    public Camera playerCamera;
     [SerializeField] private GameObject hittingSparks;
     [SerializeField] private LayerMask playerHitMask;
 
@@ -19,13 +18,20 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
     [SerializeField] private float fireRate;
     [SerializeField] private float reloadTime;
     [SerializeField] private int maxAmmunition;
+
+    [Space]
+
+    [Header("Bloom")]
     [SerializeField] public float bloomAngleMaxAmout;
+    [SerializeField] public float MaxVelocityForBloom;
 
     private int ammunitionAmount;
     private bool canShoot = true;
     private bool isReloading = false;
     private bool isShooting;
     private bool reloadInput;
+    private PlayerController playerController;
+    private WeaponRecoil weaponRecoil;
 
     [Space]
 
@@ -35,16 +41,18 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
     [SerializeField] private GameObject trail;
     [SerializeField] private GameObject bulletHolePrefab;
     [SerializeField] private Sprite[] BulletHoles;
-    private Recoil recoil;
+    private VisualRecoil recoil;
     private CameraShake camerashake;
     private Animation animation;
+
     void Start()
     {
         ammunitionAmount = maxAmmunition;
-
-        recoil = GetComponent<Recoil>();
+        recoil = GetComponent<VisualRecoil>();
         camerashake = GetComponent<CameraShake>();
         animation = GetComponent<Animation>();
+        playerController = GetComponentInParent<PlayerController>();
+        weaponRecoil = GetComponent<WeaponRecoil>();
     }
 
     void Update()
@@ -93,6 +101,8 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
         muzzleflash.Play();
         StartCoroutine(Light());
 
+        weaponRecoil.AddRecoil();
+
         ShootRaycast();
         StartCoroutine(FireRateCooldown());
     }
@@ -102,8 +112,8 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
         yield return new WaitForSeconds(0.1f);
         light.enabled = false;
     }
-
-
+    
+    
     private IEnumerator TrailAnimation(RaycastHit hit)
     {
         GameObject SpawnedTrail = Instantiate(trail, firePoint.position, Quaternion.identity);
@@ -120,8 +130,47 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
         StartCoroutine(HitSpark(hit.point, hit.normal));
         Destroy(SpawnedTrail);
     }
-
     void ShootRaycast()
+    {
+        // Get the shooting direction from the camera's forward
+        Vector3 shootDirection = playerCamera.transform.forward;
+
+        // Apply bloom if moving
+        if (playerController.m_MoveInput.x != 0 || playerController.m_MoveInput.y != 0)
+        {
+            float bloomAngle = bloomAngleMaxAmout * Mathf.Min(playerController.m_PlayerVelocity.magnitude / 2, MaxVelocityForBloom);
+            Quaternion bloomRotation = Quaternion.Euler(
+                Random.Range(-bloomAngle, bloomAngle),
+                Random.Range(-bloomAngle, bloomAngle),
+                0
+            );
+            shootDirection = bloomRotation * shootDirection;
+        }
+
+        // Perform the raycast
+        if (Physics.Raycast(firePoint.position, shootDirection, out RaycastHit hit, raycastDistance, playerHitMask))
+        {
+            Debug.DrawLine(firePoint.position, hit.point, Color.red, 1f);
+            StartCoroutine(TrailAnimation(hit));
+        }
+        else
+        {
+            Vector3 endPoint = firePoint.position + shootDirection * raycastDistance;
+            Debug.DrawLine(firePoint.position, endPoint, Color.yellow, 1f);
+
+            RaycastHit fakeHit = new RaycastHit();
+            fakeHit.point = endPoint;
+            fakeHit.normal = -shootDirection;
+            StartCoroutine(TrailAnimation(fakeHit));
+        }
+
+        // Apply effects
+        if (recoil != null) recoil.StartRecoil();  // Visual gun recoil
+        weaponRecoil.AddRecoil();                  // Camera recoil
+        camerashake.StartShake();
+        animation.Play();
+    }
+    /*void ShootRaycast()
     {
         Ray cameraRay = playerCamera.ScreenPointToRay(Input.mousePosition);
         Vector3 targetPoint;
@@ -133,20 +182,20 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
 
         Vector3 shootDirection = (targetPoint - firePoint.position).normalized;
 
-        // Bloom Recoil - Adds inaccuracy based on movement
-        float bloomAngle = 0f; // Default no bloom
+
+        float bloomAngle = 0f;
         if (playerController.m_MoveInput.x != 0 || playerController.m_MoveInput.y != 0)
         {
-            bloomAngle = bloomAngleMaxAmout * playerController.m_PlayerVelocity.magnitude / 2; // Increase bloom when moving
+            bloomAngle = bloomAngleMaxAmout * Mathf.Min(playerController.m_PlayerVelocity.magnitude / 2, MaxVelocityForBloom);
             Debug.LogWarning(bloomAngle);
 
-            bloomAngle += Random.Range(-bloomAngle, bloomAngle); // Randomized bloom effect
+            bloomAngle += Random.Range(-bloomAngle, bloomAngle);
             Quaternion bloomRotation = Quaternion.Euler(Random.Range(-bloomAngle, bloomAngle), 0, Random.Range(-bloomAngle, bloomAngle));
-            shootDirection = bloomRotation * shootDirection; // Apply bloom
+            shootDirection = bloomRotation * shootDirection;
         }
         else
         {
-            // add bloom to standing
+
         }
 
 
@@ -163,7 +212,7 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
         recoil.StartRecoil();
         camerashake.StartShake();
         animation.Play();
-    }
+    }*/
 
 
     IEnumerator HitSpark(Vector3 pos, Vector3 normal)
@@ -199,6 +248,7 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
     private IEnumerator Reload()
     {
         isReloading = true;
+        weaponRecoil.ResetRecoil();
         Debug.Log("Reloading...");
         yield return new WaitForSeconds(reloadTime);
         ammunitionAmount = maxAmmunition;

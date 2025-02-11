@@ -2,7 +2,7 @@ using Photon.Pun.Demo.Cockpit;
 using UnityEditor;
 using UnityEngine;
 
-public class Recoil : MonoBehaviour
+public class VisualRecoil : MonoBehaviour
 {
     [SerializeField] private Transform camera;
     private Vector3 IniPos;
