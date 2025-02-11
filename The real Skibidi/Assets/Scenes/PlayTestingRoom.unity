@@ -19345,6 +19345,7 @@ GameObject:
   m_Component:
   - component: {fileID: 543450652765198004}
   - component: {fileID: 919132149049084944}
+  - component: {fileID: 919132149049084945}
   m_Layer: 0
   m_Name: K-Pist
   m_TagString: Untagged
@@ -19383,6 +19384,25 @@ MonoBehaviour:
   - {fileID: 21300000, guid: bbf572ff5c8788249ad3f8f296832ad3, type: 3}
   - {fileID: 21300000, guid: e674eeeffe4000d428745052c68f78b2, type: 3}
   - {fileID: 21300000, guid: f05a39ce30dd8e44fb22ee12459a4c56, type: 3}
+--- !u!114 &919132149049084945
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 919132149049084942}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10e340d049fea234c8cbcddce7cd3e9f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  camera: {fileID: 1305581475248769243}
+  punch: 0.1
+  snap: 10
+  returnAmount: 8
+  recoilX: -2
+  recoilY: 1
+  recoilZ: 5
 --- !u!23 &976977749989884122
 MeshRenderer:
   m_ObjectHideFlags: 0

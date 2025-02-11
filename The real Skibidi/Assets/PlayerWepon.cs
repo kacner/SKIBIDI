@@ -34,6 +34,7 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
     [SerializeField] private GameObject trail;
     [SerializeField] private GameObject bulletHolePrefab;
     [SerializeField] private Sprite[] BulletHoles;
+    private Recoil recoil;
     void Start()
     {
         ammunitionAmount = maxAmmunition;
@@ -46,6 +47,8 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
 
         if (playerCamera == null)
             Debug.LogError("Player Camera is not assigned!");
+
+        recoil = GetComponent<Recoil>();
     }
 
     void Update()
@@ -120,7 +123,7 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
             SpawnedTrail.transform.position = Vector3.Lerp(SpawnedTrail.transform.position, hit.point, timer / duration);
             yield return null;
         }
-        PlayerHitDetect(hit.point, hit.normal);
+        StartCoroutine(HitSpark(hit.point, hit.normal));
         Destroy(SpawnedTrail);
     }
 
@@ -145,23 +148,29 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
             Debug.DrawLine(firePoint.position, firePoint.position + shootDirection * raycastDistance, Color.yellow, 1f);
         }
         StartCoroutine(TrailAnimation(hit));
+        recoil.StartRecoil();
     }
 
-    IEnumerator PlayerHitDetect(Vector3 pos, Vector3 normal)
+    IEnumerator HitSpark(Vector3 pos, Vector3 normal)
     {
-        Quaternion hitRotation = Quaternion.LookRotation(normal);
-        GameObject spark = Instantiate(hittingSparks, pos, Quaternion.identity);
+        Quaternion rotation = Quaternion.LookRotation(normal);
+        GameObject spark = Instantiate(hittingSparks, pos, rotation);
 
-        CreateBulletHole(pos);
+        CreateBulletHole(pos, rotation);
 
         yield return new WaitForSeconds(0.1f);
         Destroy(spark);
     }
 
-    private void CreateBulletHole(Vector3 pos)
+    private void CreateBulletHole(Vector3 pos, Quaternion rotation)
     {
-        GameObject decal = Instantiate(bulletHolePrefab, pos, Quaternion.identity);
+        Vector3 adjustedPosition = pos + rotation * Vector3.forward * 0.01f;
+        GameObject decal = Instantiate(bulletHolePrefab, adjustedPosition, rotation);
+
         SpriteRenderer spriteRenderer = decal.GetComponent<SpriteRenderer>();
+
+        decal.transform.rotation = Quaternion.Euler(decal.transform.rotation.eulerAngles.x, decal.transform.rotation.eulerAngles.y, UnityEngine.Random.RandomRange(-360f, 360f));
+
         int rnd = UnityEngine.Random.RandomRange(0, BulletHoles.Length);
         spriteRenderer.sprite = BulletHoles[rnd];
     }
