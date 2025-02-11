@@ -62,7 +62,6 @@ namespace Movement
         public float Speed { get { return m_Character.velocity.magnitude; } }
 
         private CharacterController m_Character;
-        private Vector3 m_MoveDirectionNorm = Vector3.zero;
         private Vector3 m_PlayerVelocity = Vector3.zero;
 
         private bool m_JumpQueued = false;
@@ -189,7 +188,6 @@ namespace Movement
             wishspeed *= m_AirSettings.MaxSpeed;
 
             wishdir.Normalize();
-            m_MoveDirectionNorm = wishdir;
 
             float wishspeed2 = wishspeed;
             if (Vector3.Dot(m_PlayerVelocity, wishdir) < 0)
@@ -244,7 +242,6 @@ namespace Movement
                 m_PlayerVelocity.z *= speed + targetDir.z * k;
 
                 m_PlayerVelocity.Normalize();
-                m_MoveDirectionNorm = m_PlayerVelocity;
             }
 
             m_PlayerVelocity.x *= speed;
@@ -267,7 +264,6 @@ namespace Movement
             var wishdir = new Vector3(m_MoveInput.x, 0, m_MoveInput.z);
             wishdir = m_Tran.TransformDirection(wishdir);
             wishdir.Normalize();
-            m_MoveDirectionNorm = wishdir;
 
             var wishspeed = wishdir.magnitude;
             if (!isCrouching)

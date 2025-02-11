@@ -1,54 +1,47 @@
 using Photon.Pun;
-using System;
 using System.Collections;
-using UnityEditor;
 using UnityEngine;
-using static UnityEditor.PlayerSettings;
 
 public class PlayerWeapon : MonoBehaviourPunCallbacks
 {
-    public GameObject round;
+    [Header("Setup")]
+    [SerializeField] private Transform firePoint;
+    [SerializeField] private Camera playerCamera;
+    [SerializeField] private GameObject hittingSparks;
+    [SerializeField] private LayerMask playerHitMask;
 
-    // Shooting Setup
-    public Transform firePoint;   // Where bullets originate
-    public Camera playerCamera;   // The player's camera for aiming
-    public GameObject hittingSparks;
-    public LayerMask playerHitMask;
+    [Space]
 
-
-    // Weapon Stats
-    public float raycastDistance = 100f;
-    public float fireRate = 0.2f;
-    public float reloadTime = 2f;
-    public int maxAmmunition = 10;
+    [Header("Weapond Settings")]
+    [SerializeField] private float raycastDistance = 100f;
+    [SerializeField] private float fireRate = 0.2f;
+    [SerializeField] private float reloadTime = 2f;
+    [SerializeField] private int maxAmmunition = 10;
 
     private int ammunitionAmount;
     private bool canShoot = true;
     private bool isReloading = false;
-
     private bool isShooting;
     private bool reloadInput;
 
+    [Space]
+
+    [Header("VFX")]
     [SerializeField] private ParticleSystem muzzleflash;
     [SerializeField] private Light light;
     [SerializeField] private GameObject trail;
     [SerializeField] private GameObject bulletHolePrefab;
     [SerializeField] private Sprite[] BulletHoles;
     private Recoil recoil;
+    private CameraShake camerashake;
+    private Animation animation;
     void Start()
     {
         ammunitionAmount = maxAmmunition;
 
-        if (round == null)
-            Debug.LogError("No bullet assigned!");
-
-        if (firePoint == null)
-            Debug.LogError("FirePoint is not assigned!");
-
-        if (playerCamera == null)
-            Debug.LogError("Player Camera is not assigned!");
-
         recoil = GetComponent<Recoil>();
+        camerashake = GetComponent<CameraShake>();
+        animation = GetComponent<Animation>();
     }
 
     void Update()
@@ -85,16 +78,16 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
 
     void FireBullet()
     {
-        if (ammunitionAmount <= 0)
+        /*if (ammunitionAmount <= 0)
         {
             Debug.Log("Out of bullets! Reload needed.");
             return;
-        }
+        }*/
 
         ammunitionAmount--;
         canShoot = false;
 
-        Debug.Log($"Bullet Amount: {ammunitionAmount}");
+        //Debug.Log($"Bullet Amount: {ammunitionAmount}");
 
         muzzleflash.Play();
         StartCoroutine(Light());
@@ -149,6 +142,8 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
         }
         StartCoroutine(TrailAnimation(hit));
         recoil.StartRecoil();
+        camerashake.StartShake();
+        animation.Play();
     }
 
     IEnumerator HitSpark(Vector3 pos, Vector3 normal)

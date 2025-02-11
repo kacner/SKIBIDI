@@ -6,17 +6,17 @@ public class Recoil : MonoBehaviour
 {
     [SerializeField] private Transform camera;
     private Vector3 IniPos;
-    private Vector3 IniRotation;
     private Vector3 currentPos;
     private Vector3 targetpos;
     private Vector3 currentRotation;
     private Vector3 targetRotaion;
-    [SerializeField] float punch;
+    [SerializeField] private float punch;
     [SerializeField] private float snap;
     [SerializeField] private float returnAmount;
-    [SerializeField] float recoilX;
-    [SerializeField] float recoilY;
-    [SerializeField] float recoilZ;
+    [SerializeField] private float recoilX;
+    [SerializeField] private float recoilY;
+    [SerializeField] private float recoilZ;
+    [SerializeField] private float GunRotationOffset = 180;
 
     private void Start()
     {
@@ -27,7 +27,7 @@ public class Recoil : MonoBehaviour
     {
         targetRotaion = Vector3.Lerp(targetRotaion, Vector3.zero, returnAmount * Time.deltaTime);
         currentRotation = Vector3.Slerp(currentRotation, targetRotaion, snap * Time.deltaTime);
-        transform.localRotation = Quaternion.Euler(currentRotation) * new Quaternion(0, 180, 0, 0);
+        transform.localRotation = Quaternion.Euler(currentRotation) * new Quaternion(0, GunRotationOffset, 0, 0);
         //camera.localRotation = Quaternion.Euler(currentRotation);
         back();
     }
