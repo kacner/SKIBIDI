@@ -24153,7 +24153,7 @@ MonoBehaviour:
   raycastDistance: 100
   fireRate: 0.1
   reloadTime: 2
-  maxAmmunition: 10
+  maxAmmunition: 100
   muzzleflash: {fileID: 1420367174}
   light: {fileID: 1303637195}
   trail: {fileID: 9008128420236410051, guid: 6dc975bc7a9f3724eb9435507572025b, type: 3}
@@ -24656,33 +24656,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &1973163641920293673
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3730952686587097674}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3d3a501b838c0284f84126f762249d09, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  firePoint: {fileID: 732293417}
-  playerCamera: {fileID: 7894889811080222739}
-  hittingSparks: {fileID: 0}
-  playerHitMask:
-    serializedVersion: 2
-    m_Bits: 0
-  raycastDistance: 100
-  fireRate: 0.5
-  reloadTime: 2
-  maxAmmunition: 25
-  muzzleflash: {fileID: 0}
-  light: {fileID: 0}
-  trail: {fileID: 0}
-  bulletHolePrefab: {fileID: 0}
-  BulletHoles: []
 --- !u!33 &2102627423281774013
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -25144,12 +25117,9 @@ GameObject:
   - component: {fileID: 6538540493057586295}
   - component: {fileID: 2314329207669608720}
   - component: {fileID: 2299779455629753952}
-  - component: {fileID: 1973163641920293673}
   - component: {fileID: 2168556563061423786}
   - component: {fileID: 719103257579394727}
   - component: {fileID: 6928640643411488930}
-  - component: {fileID: 5819796333051023559}
-  - component: {fileID: 6928640643411488931}
   m_Layer: 6
   m_Name: Player
   m_TagString: Untagged
@@ -35056,24 +35026,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1420367172}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5819796333051023559
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3730952686587097674}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bdb6828fde841664a915e9b0e267f6a6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerCamera: {fileID: 7894889811080222739}
-  rayDistance: 50
-  rayLayerMask:
-    serializedVersion: 2
-    m_Bits: 64
-  ActionText: {fileID: 8389945945889468614}
 --- !u!114 &5878913618007710627
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -35455,18 +35407,6 @@ MonoBehaviour:
     customString: Use space to jump
     requiredTag: Carly
     textCanvasGroup: {fileID: 0}
---- !u!114 &6928640643411488931
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3730952686587097674}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 18117185871526343bee17d705b3e93b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &6935145060391211960
 MonoBehaviour:
   m_ObjectHideFlags: 0
