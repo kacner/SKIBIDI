@@ -11,8 +11,6 @@ public class crosshair : MonoBehaviour
     private RectTransform top, bottom, left, right;
     private Camera playerCamera;
 
-    private bool isCreated = false;
-
     void Start()
     {
         playerCamera = Camera.main;
@@ -26,11 +24,6 @@ public class crosshair : MonoBehaviour
         left = CreateLine("Left");
         right = CreateLine("Right");
 
-        UpdateCrosshair();
-    }
-
-    private void OnValidate()
-    {
         UpdateCrosshair();
     }
 

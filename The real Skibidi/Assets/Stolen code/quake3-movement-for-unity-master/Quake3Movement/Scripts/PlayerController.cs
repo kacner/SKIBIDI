@@ -66,8 +66,6 @@ namespace Movement
 
         private bool m_JumpQueued = false;
 
-        private float m_PlayerFriction = 0;
-
         public Vector3 m_MoveInput;
         private Transform m_Tran;
         private Transform m_CamTran;
@@ -298,7 +296,6 @@ namespace Movement
             }
 
             float newSpeed = speed - drop;
-            m_PlayerFriction = newSpeed;
             if (newSpeed < 0)
             {
                 newSpeed = 0;

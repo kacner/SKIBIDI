@@ -70,7 +70,7 @@ namespace Movement
             {
                 m_LockCursor = value;
                 if (!m_LockCursor)
-                {//we force unlock the cursor if the user disable the cursor locking helper
+                {
                     Cursor.lockState = CursorLockMode.None;
                     Cursor.visible = true;
                 }
@@ -81,7 +81,6 @@ namespace Movement
         {
             if (photonView != null && photonView.IsMine)
             {
-                //if the user set "lockCursor" we check & properly lock the cursos
                 if (m_LockCursor)
                 {
                     InternalLockUpdate();

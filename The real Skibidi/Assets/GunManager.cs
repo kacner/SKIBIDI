@@ -1,3 +1,4 @@
+using Movement;
 using UnityEngine;
 
 public class GunManager : MonoBehaviour
@@ -8,6 +9,8 @@ public class GunManager : MonoBehaviour
     [SerializeField] private GameObject[] gunPickups;
     [SerializeField] private Transform DropPoint;
     [SerializeField] private float DroppForce;
+    [SerializeField] private float DroppRotationFactor = 0.5f;
+    [SerializeField] private PlayerController playerMovement;
     private void Start()
     {
         playerWeapondScripts = new PlayerWeapon[guns.Length];
@@ -45,7 +48,6 @@ public class GunManager : MonoBehaviour
         }
     }
 
-
     public void pickupGun(string GunName)
     {
         ActivateGun(GunName);
@@ -73,6 +75,11 @@ public class GunManager : MonoBehaviour
                     Rigidbody DroppedsRigidbody = dropppedGun.GetComponent<Rigidbody>();
                     DroppedsRigidbody.AddForce(transform.forward * DroppForce, ForceMode.Impulse);
                     DroppedsRigidbody.AddForce(transform.up * DroppForce * 0.65f, ForceMode.Impulse);
+                    DroppedsRigidbody.AddForce(playerMovement.m_PlayerVelocity * 0.5f, ForceMode.Impulse);
+
+                    Vector3 randomTorque = new Vector3(Random.Range(0.2f, 0.5f), Random.Range(-0.01f, 0.01f), Random.Range(-0.01f, 0.01f)) * DroppForce * DroppRotationFactor;
+
+                    DroppedsRigidbody.AddTorque(randomTorque, ForceMode.Impulse);
                     break;
                 }
                 else

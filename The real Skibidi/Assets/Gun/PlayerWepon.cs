@@ -1,6 +1,7 @@
 using Movement;
 using Photon.Pun;
 using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
@@ -12,6 +13,7 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
     [SerializeField] private GameObject hittingSparks;
     [SerializeField] private LayerMask playerHitMask;
     [SerializeField] private TextMeshProUGUI ammoText;
+    [SerializeField] private Transform BulletHoleFoder;
 
     [Space]
 
@@ -34,6 +36,7 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
     private bool reloadInput;
     private PlayerController playerController;
     private WeaponRecoil weaponRecoil;
+    private List<GameObject> trails = new List<GameObject>();
 
     [Space]
 
@@ -62,11 +65,17 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
         isReloading = false;
         muzzleflash.Stop();
         light.enabled = false;
-        
+
+        foreach (GameObject item in trails)
+        {
+            Destroy(item);
+        }
+        trails.Clear();
     }
 
     void Update()
     {
+
         if (!photonView.IsMine) return;
 
         HandleInput();
@@ -143,6 +152,7 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
     private IEnumerator TrailAnimation(RaycastHit hit)
     {
         GameObject SpawnedTrail = Instantiate(trail, firePoint.position, Quaternion.identity);
+        trails.Add(SpawnedTrail);
 
         float timer = 0;
         float duration = 0.1f;
@@ -158,7 +168,10 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
     }
     void ShootRaycast()
     {
-        Vector3 shootDirection = playerCamera.transform.forward;
+        Vector3 screenCenter = new Vector3(Screen.width / 2f, Screen.height / 2f, 0f);
+
+        Ray ray = playerCamera.ScreenPointToRay(screenCenter);
+        Vector3 shootDirection = ray.direction;
 
         if (playerController.m_MoveInput.x != 0 || playerController.m_MoveInput.y != 0)
         {
@@ -171,15 +184,16 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
             shootDirection = bloomRotation * shootDirection;
         }
 
-        if (Physics.Raycast(firePoint.position, shootDirection, out RaycastHit hit, raycastDistance, playerHitMask))
+        if (Physics.Raycast(playerCamera.transform.position, shootDirection, out RaycastHit hit, raycastDistance, playerHitMask))
         {
-            Debug.DrawLine(firePoint.position, hit.point, Color.red, 1f);
+            Debug.DrawLine(playerCamera.transform.position, hit.point, Color.red, 1f);
+
             StartCoroutine(TrailAnimation(hit));
         }
         else
         {
-            Vector3 endPoint = firePoint.position + shootDirection * raycastDistance;
-            Debug.DrawLine(firePoint.position, endPoint, Color.yellow, 1f);
+            Vector3 endPoint = playerCamera.transform.position + shootDirection * raycastDistance;
+            Debug.DrawLine(playerCamera.transform.position, endPoint, Color.yellow, 1f);
 
             RaycastHit fakeHit = new RaycastHit();
             fakeHit.point = endPoint;
@@ -192,7 +206,6 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
         camerashake.StartShake();
         animation.Play();
     }
-
 
     IEnumerator HitSpark(Vector3 pos, Vector3 normal)
     {
@@ -209,7 +222,7 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
     {
         Vector3 adjustedPosition = pos + rotation * Vector3.forward * 0.01f;
         GameObject decal = Instantiate(bulletHolePrefab, adjustedPosition, rotation);
-
+        decal.transform.parent = BulletHoleFoder;
         SpriteRenderer spriteRenderer = decal.GetComponent<SpriteRenderer>();
 
         decal.transform.rotation = Quaternion.Euler(decal.transform.rotation.eulerAngles.x, decal.transform.rotation.eulerAngles.y, Random.RandomRange(-360f, 360f));
