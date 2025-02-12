@@ -1,6 +1,7 @@
 using Movement;
 using Photon.Pun;
 using System.Collections;
+using TMPro;
 using UnityEngine;
 
 public class PlayerWeapon : MonoBehaviourPunCallbacks
@@ -10,6 +11,7 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
     public Camera playerCamera;
     [SerializeField] private GameObject hittingSparks;
     [SerializeField] private LayerMask playerHitMask;
+    [SerializeField] private TextMeshProUGUI ammoText;
 
     [Space]
 
@@ -18,6 +20,7 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
     [SerializeField] private float fireRate;
     [SerializeField] private float reloadTime;
     [SerializeField] private int maxAmmunition;
+    [SerializeField] private int ammunitionAmount;
 
     [Space]
 
@@ -25,10 +28,9 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
     [SerializeField] public float bloomAngleMaxAmout;
     [SerializeField] public float MaxVelocityForBloom;
 
-    private int ammunitionAmount;
     private bool canShoot = true;
     private bool isReloading = false;
-    private bool isShooting;
+    private bool isMouse0;
     private bool reloadInput;
     private PlayerController playerController;
     private WeaponRecoil weaponRecoil;
@@ -61,12 +63,17 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
 
         HandleInput();
 
-        if (isShooting && canShoot && !isReloading)
+        if (isMouse0 && canShoot && !isReloading)
         {
             StartCoroutine(AutoFire());
         }
 
-        if (reloadInput && !isReloading)
+        print(!isMouse0 && ammunitionAmount == 0 && !isReloading);
+        if (reloadInput && !isReloading && !isMouse0 && ammunitionAmount < maxAmmunition)
+        {
+            StartCoroutine(Reload());
+        }
+        if (ammunitionAmount == 0 && !isReloading)
         {
             StartCoroutine(Reload());
         }
@@ -74,13 +81,13 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
 
     void HandleInput()
     {
-        isShooting = Input.GetKey(KeyCode.Mouse0); // Hold for full-auto
-        reloadInput = Input.GetKeyDown(KeyCode.R); // Press R to reload
+        isMouse0 = Input.GetKey(KeyCode.Mouse0);
+        reloadInput = Input.GetKeyDown(KeyCode.R);
     }
 
     private IEnumerator AutoFire()
     {
-        while (isShooting && canShoot && ammunitionAmount > 0 && !isReloading)
+        while (isMouse0 && canShoot && ammunitionAmount > 0 && !isReloading)
         {
             FireBullet();
             yield return new WaitForSeconds(fireRate);
@@ -89,13 +96,8 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
 
     void FireBullet()
     {
-        /*if (ammunitionAmount <= 0)
-        {
-            Debug.Log("Out of bullets! Reload needed.");
-            return;
-        }*/
-
         ammunitionAmount--;
+        updateAmmoText();
         canShoot = false;
 
         muzzleflash.Play();
@@ -111,6 +113,23 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
         light.enabled = true;
         yield return new WaitForSeconds(0.1f);
         light.enabled = false;
+    }
+
+    void updateAmmoText()
+    {
+        string AmmoCount = "";
+        if (ammunitionAmount < 6)
+        {
+            for (int i = 0; i < ammunitionAmount; i++)
+            {
+                AmmoCount += 'l';
+            }
+        }
+        else
+        {
+            AmmoCount = "lllll";
+        }
+        ammoText.text = $"{ammunitionAmount} / {maxAmmunition}  {AmmoCount}";
     }
     
     
@@ -132,10 +151,8 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
     }
     void ShootRaycast()
     {
-        // Get the shooting direction from the camera's forward
         Vector3 shootDirection = playerCamera.transform.forward;
 
-        // Apply bloom if moving
         if (playerController.m_MoveInput.x != 0 || playerController.m_MoveInput.y != 0)
         {
             float bloomAngle = bloomAngleMaxAmout * Mathf.Min(playerController.m_PlayerVelocity.magnitude / 2, MaxVelocityForBloom);
@@ -147,7 +164,6 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
             shootDirection = bloomRotation * shootDirection;
         }
 
-        // Perform the raycast
         if (Physics.Raycast(firePoint.position, shootDirection, out RaycastHit hit, raycastDistance, playerHitMask))
         {
             Debug.DrawLine(firePoint.position, hit.point, Color.red, 1f);
@@ -164,55 +180,11 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
             StartCoroutine(TrailAnimation(fakeHit));
         }
 
-        // Apply effects
-        if (recoil != null) recoil.StartRecoil();  // Visual gun recoil
-        weaponRecoil.AddRecoil();                  // Camera recoil
+        recoil.StartRecoil();
+        weaponRecoil.AddRecoil();
         camerashake.StartShake();
         animation.Play();
     }
-    /*void ShootRaycast()
-    {
-        Ray cameraRay = playerCamera.ScreenPointToRay(Input.mousePosition);
-        Vector3 targetPoint;
-
-        if (Physics.Raycast(cameraRay, out RaycastHit hitInfo, raycastDistance, playerHitMask))
-            targetPoint = hitInfo.point;
-        else
-            targetPoint = cameraRay.origin + cameraRay.direction * raycastDistance;
-
-        Vector3 shootDirection = (targetPoint - firePoint.position).normalized;
-
-
-        float bloomAngle = 0f;
-        if (playerController.m_MoveInput.x != 0 || playerController.m_MoveInput.y != 0)
-        {
-            bloomAngle = bloomAngleMaxAmout * Mathf.Min(playerController.m_PlayerVelocity.magnitude / 2, MaxVelocityForBloom);
-            Debug.LogWarning(bloomAngle);
-
-            bloomAngle += Random.Range(-bloomAngle, bloomAngle);
-            Quaternion bloomRotation = Quaternion.Euler(Random.Range(-bloomAngle, bloomAngle), 0, Random.Range(-bloomAngle, bloomAngle));
-            shootDirection = bloomRotation * shootDirection;
-        }
-        else
-        {
-
-        }
-
-
-        if (Physics.Raycast(firePoint.position, shootDirection, out RaycastHit hit, raycastDistance, playerHitMask))
-        {
-            Debug.DrawLine(firePoint.position, hit.point, Color.red, 1f);
-        }
-        else
-        {
-            Debug.DrawLine(firePoint.position, firePoint.position + shootDirection * raycastDistance, Color.yellow, 1f);
-        }
-
-        StartCoroutine(TrailAnimation(hit));
-        recoil.StartRecoil();
-        camerashake.StartShake();
-        animation.Play();
-    }*/
 
 
     IEnumerator HitSpark(Vector3 pos, Vector3 normal)
@@ -233,9 +205,9 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
 
         SpriteRenderer spriteRenderer = decal.GetComponent<SpriteRenderer>();
 
-        decal.transform.rotation = Quaternion.Euler(decal.transform.rotation.eulerAngles.x, decal.transform.rotation.eulerAngles.y, UnityEngine.Random.RandomRange(-360f, 360f));
+        decal.transform.rotation = Quaternion.Euler(decal.transform.rotation.eulerAngles.x, decal.transform.rotation.eulerAngles.y, Random.RandomRange(-360f, 360f));
 
-        int rnd = UnityEngine.Random.RandomRange(0, BulletHoles.Length);
+        int rnd = Random.RandomRange(0, BulletHoles.Length);
         spriteRenderer.sprite = BulletHoles[rnd];
     }
 
@@ -248,11 +220,12 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
     private IEnumerator Reload()
     {
         isReloading = true;
-        weaponRecoil.ResetRecoil();
         Debug.Log("Reloading...");
         yield return new WaitForSeconds(reloadTime);
+        weaponRecoil.ResetRecoil();
         ammunitionAmount = maxAmmunition;
         isReloading = false;
         Debug.Log("Reload complete!");
+        updateAmmoText();
     }
 }

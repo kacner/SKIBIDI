@@ -15,13 +15,17 @@ public class WeaponRecoil : MonoBehaviour
     [SerializeField] private float randomRecoilX = 0.5f;
     [SerializeField] private float randomRecoilY = 0.5f;
 
+    [Header("Lerp Settings")]
+    [SerializeField] private float recoilLerpSpeed = 10f;
+    [SerializeField] private float recoveryLerpSpeed = 5f;
+
     private Vector2 currentRecoil;
     private Vector2 recoilVelocity;
     private Camera mainCamera;
     private bool isRecoiling;
     private Vector3 originalCameraRotation;
     private GameObject recoilContainer;
-
+    private Quaternion targetRotation;
     void Start()
     {
         mainCamera = GetComponentInParent<Camera>();
@@ -31,13 +35,11 @@ public class WeaponRecoil : MonoBehaviour
 
     void SetupRecoilContainer()
     {
-        // Create a container for recoil that sits between the camera and its parent
         recoilContainer = new GameObject("RecoilContainer");
         recoilContainer.transform.SetParent(mainCamera.transform.parent);
         recoilContainer.transform.localPosition = Vector3.zero;
         recoilContainer.transform.localRotation = Quaternion.identity;
 
-        // Move the camera to be a child of the recoil container
         Vector3 originalPos = mainCamera.transform.localPosition;
         Quaternion originalRot = mainCamera.transform.localRotation;
         mainCamera.transform.SetParent(recoilContainer.transform);
@@ -45,33 +47,50 @@ public class WeaponRecoil : MonoBehaviour
         mainCamera.transform.localRotation = originalRot;
 
         originalCameraRotation = recoilContainer.transform.localEulerAngles;
+        targetRotation = Quaternion.Euler(originalCameraRotation);
     }
 
     void Update()
     {
         if (!isRecoiling)
         {
-            // Smoothly return recoil to zero
             currentRecoil.x = Mathf.SmoothDamp(currentRecoil.x, 0f, ref recoilVelocity.x, recoilRecoveryX * Time.deltaTime);
             currentRecoil.y = Mathf.SmoothDamp(currentRecoil.y, 0f, ref recoilVelocity.y, recoilRecoveryY * Time.deltaTime);
 
-            // Apply the recovered rotation to the recoil container
-            ApplyRecoilToContainer();
+            Vector3 newRotation = new Vector3(
+                ClampAngle(originalCameraRotation.x - currentRecoil.y, -90f, 90f),
+                originalCameraRotation.y + currentRecoil.x,
+                originalCameraRotation.z
+            );
+            targetRotation = Quaternion.Euler(newRotation);
+
+            if (recoilContainer != null)
+            {
+                recoilContainer.transform.localRotation = Quaternion.Lerp(
+                    recoilContainer.transform.localRotation,
+                    targetRotation,
+                    Time.deltaTime * recoveryLerpSpeed
+                );
+            }
         }
     }
 
     public void AddRecoil()
     {
-        // Calculate recoil amount with randomization
         float recoilAmountX = Random.Range(-randomRecoilX, randomRecoilX) * recoilX;
         float recoilAmountY = Random.Range(0f, randomRecoilY) * recoilY;
 
-        // Add to current recoil, clamping to max values
         currentRecoil.x = Mathf.Clamp(currentRecoil.x + recoilAmountX, -maxRecoilX, maxRecoilX);
-        currentRecoil.y = Mathf.Clamp(currentRecoil.y + recoilAmountY, 0f, maxRecoilY);
 
-        // Apply the recoil
-        ApplyRecoilToContainer();
+        float newMaxRecoil = maxRecoilY + maxRecoilY * Random.Range(-0.15f, 0.15f);
+        currentRecoil.y = Mathf.Clamp(currentRecoil.y + recoilAmountY, 0f, newMaxRecoil);
+
+        Vector3 newRotation = new Vector3(
+            ClampAngle(originalCameraRotation.x - currentRecoil.y, -90f, 90f),
+            originalCameraRotation.y + currentRecoil.x,
+            originalCameraRotation.z
+        );
+        targetRotation = Quaternion.Euler(newRotation);
 
         if (!isRecoiling)
         {
@@ -83,14 +102,12 @@ public class WeaponRecoil : MonoBehaviour
     {
         if (recoilContainer != null)
         {
-            // Create new rotation with recoil
             Vector3 newRotation = new Vector3(
                 ClampAngle(originalCameraRotation.x - currentRecoil.y, -90f, 90f),
                 originalCameraRotation.y + currentRecoil.x,
                 originalCameraRotation.z
             );
 
-            // Apply the rotation to the container
             recoilContainer.transform.localRotation = Quaternion.Euler(newRotation);
         }
     }
@@ -105,7 +122,24 @@ public class WeaponRecoil : MonoBehaviour
     private IEnumerator RecoilCooldown()
     {
         isRecoiling = true;
-        yield return new WaitForSeconds(0.1f);
+
+        float elapsedTime = 0f;
+        Quaternion startRotation = recoilContainer.transform.localRotation;
+
+        while (elapsedTime < 0.1f)
+        {
+            elapsedTime += Time.deltaTime;
+            float t = elapsedTime / 0.1f;
+
+            recoilContainer.transform.localRotation = Quaternion.Lerp(
+                startRotation,
+                targetRotation,
+                t * recoilLerpSpeed
+            );
+
+            yield return null;
+        }
+
         isRecoiling = false;
     }
 
@@ -114,9 +148,10 @@ public class WeaponRecoil : MonoBehaviour
         currentRecoil = Vector2.zero;
         recoilVelocity = Vector2.zero;
         isRecoiling = false;
+        targetRotation = Quaternion.Euler(originalCameraRotation);
         if (recoilContainer != null)
         {
-            recoilContainer.transform.localRotation = Quaternion.Euler(originalCameraRotation);
+            recoilContainer.transform.localRotation = targetRotation;
         }
     }
 }

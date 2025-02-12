@@ -28,7 +28,7 @@ public class FacePlayer : MonoBehaviour
 
         if (localCamera != null)
         {
-            Debug.Log("Local camera found for client.");
+
         }
         else
         {
