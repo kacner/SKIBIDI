@@ -15,8 +15,7 @@ public class WillBePickedUp : MonoBehaviour
     IEnumerator cooldown()
     {
         collider.enabled = false;
-        yield return new WaitForSeconds(5f);
+        yield return new WaitForSeconds(0.5f);
         collider.enabled = true;
-
     }
 }

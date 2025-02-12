@@ -56,6 +56,14 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
         playerController = GetComponentInParent<PlayerController>();
         weaponRecoil = GetComponent<WeaponRecoil>();
     }
+    public void ForceReset()
+    {
+        canShoot = true;
+        isReloading = false;
+        muzzleflash.Stop();
+        light.enabled = false;
+        
+    }
 
     void Update()
     {

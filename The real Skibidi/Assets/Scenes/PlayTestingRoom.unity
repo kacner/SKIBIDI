@@ -716,7 +716,7 @@ GameObject:
   - component: {fileID: 79116309}
   - component: {fileID: 79116310}
   m_Layer: 0
-  m_Name: <<GUNS>>
+  m_Name: <<GunManager>>
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -756,7 +756,7 @@ MonoBehaviour:
   gunPickups:
   - {fileID: 6390819278296793926, guid: 862b03cec971fe645977ac7de32b9655, type: 3}
   DropPoint: {fileID: 1673988955}
-  DroppForce: 0.5
+  DroppForce: 5
 --- !u!1 &92157038 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 54b42edcaad42ae47a7bb0aed0c47e98, type: 3}
@@ -2288,59 +2288,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: a54bb0fbf93b09440a77975415674e2a, type: 3}
   m_PrefabInstance: {fileID: 616248287}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &355703928
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 355703930}
-  - component: {fileID: 355703929}
-  m_Layer: 0
-  m_Name: TextInt (1)
-  m_TagString: Carly
-  m_Icon: {fileID: -964228994112308473, guid: 0000000000000000d000000000000000, type: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!65 &355703929
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 355703928}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 18.374222, y: 1, z: 1}
-  m_Center: {x: -0.45010138, y: 0, z: 0}
---- !u!4 &355703930
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 355703928}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -16.67, y: 1.24, z: 45.71}
-  m_LocalScale: {x: 2.55, y: 2.55, z: 2.55}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &355706507 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 538b559633151a146bddd33879fb3038, type: 3}
@@ -21966,7 +21913,7 @@ Transform:
   m_GameObject: {fileID: 1673988954}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.392, z: 0.581}
+  m_LocalPosition: {x: 0, y: 0.86, z: 1.539}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -23053,59 +23000,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: a54bb0fbf93b09440a77975415674e2a, type: 3}
   m_PrefabInstance: {fileID: 178245256}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1949182577
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1949182579}
-  - component: {fileID: 1949182578}
-  m_Layer: 0
-  m_Name: TextInt (2)
-  m_TagString: David
-  m_Icon: {fileID: -964228994112308473, guid: 0000000000000000d000000000000000, type: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!65 &1949182578
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1949182577}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 18.374222, y: 1, z: 1}
-  m_Center: {x: -0.45010138, y: 0, z: 0}
---- !u!4 &1949182579
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1949182577}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -16.67, y: 1.24, z: 27.64}
-  m_LocalScale: {x: 2.55, y: 2.55, z: 2.55}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1949243105
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -35598,15 +35492,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc6ba13d7416b184382fc0c53931c6eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  pvCache: {fileID: 0}
   textTriggers:
-  - textDisplay: {fileID: 0}
-    customString: Use W,S,A,D for movment and mouse to look
-    requiredTag: David
-    textCanvasGroup: {fileID: 0}
-  - textDisplay: {fileID: 0}
-    customString: Use space to jump
-    requiredTag: Carly
-    textCanvasGroup: {fileID: 0}
+  - {textDisplay: {fileID: 0}, customString: Use W,S,A,D for movment and mouse to look, requiredTag: David, textCanvasGroup: {fileID: 0}}
+  - {textDisplay: {fileID: 0}, customString: Use space to jump, requiredTag: Carly, textCanvasGroup: {fileID: 0}}
 --- !u!114 &6935145060391211960
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -36138,8 +36027,6 @@ SceneRoots:
   - {fileID: 2051973861}
   - {fileID: 191121275}
   - {fileID: 454567069}
-  - {fileID: 355703930}
-  - {fileID: 1949182579}
   - {fileID: 410155971}
   - {fileID: 292896492}
   - {fileID: 987140803}

@@ -7,7 +7,8 @@ public class GunPickUp : MonoBehaviour
     {
         if (other.gameObject.tag == "PickUpable")
         {
-            gunManager.pickupGun(other.gameObject.name.Replace("Pickup", ""));
+            string ItemName = other.gameObject.name.Replace("Pickup", "");
+            gunManager.pickupGun(ItemName.Replace("(Clone)", ""));
             Destroy(other.gameObject);
         }
     }
