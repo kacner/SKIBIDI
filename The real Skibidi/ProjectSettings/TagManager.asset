@@ -8,6 +8,7 @@ TagManager:
   - David
   - Carly
   - Bullet
+  - PickUpable
   layers:
   - Default
   - TransparentFX

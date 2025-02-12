@@ -68,7 +68,6 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
             StartCoroutine(AutoFire());
         }
 
-        print(!isMouse0 && ammunitionAmount == 0 && !isReloading);
         if (reloadInput && !isReloading && !isMouse0 && ammunitionAmount < maxAmmunition)
         {
             StartCoroutine(Reload());
