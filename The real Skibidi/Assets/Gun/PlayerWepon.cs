@@ -23,6 +23,7 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
     [SerializeField] private float reloadTime;
     [SerializeField] private int maxAmmunition;
     [SerializeField] private int ammunitionAmount;
+    [SerializeField] private bool isAutomatic = true;
 
     [Space]
 
@@ -97,7 +98,11 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
 
     void HandleInput()
     {
-        isMouse0 = Input.GetKey(KeyCode.Mouse0);
+        if (isAutomatic)
+            isMouse0 = Input.GetKey(KeyCode.Mouse0);
+        else
+            isMouse0 = Input.GetKeyDown(KeyCode.Mouse0);
+
         reloadInput = Input.GetKeyDown(KeyCode.R);
     }
 
@@ -175,7 +180,7 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
 
         if (playerController.m_MoveInput.x != 0 || playerController.m_MoveInput.y != 0)
         {
-            float bloomAngle = bloomAngleMaxAmout * Mathf.Min(playerController.m_PlayerVelocity.magnitude / 2, MaxVelocityForBloom);
+            float bloomAngle = bloomAngleMaxAmout * Mathf.Min(Mathf.Abs(playerController.m_PlayerVelocity.magnitude) / 2, MaxVelocityForBloom);
             Quaternion bloomRotation = Quaternion.Euler(
                 Random.Range(-bloomAngle, bloomAngle),
                 Random.Range(-bloomAngle, bloomAngle),
@@ -204,6 +209,7 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
         recoil.StartRecoil();
         weaponRecoil.AddRecoil();
         camerashake.StartShake();
+        if (animation != null)
         animation.Play();
     }
 
