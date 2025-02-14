@@ -15,12 +15,12 @@ public class GunPickUp : MonoBehaviour
 
             if (gunManager.PrimaryGun == "" && gunGravity.gunInventoryType == GunInventoryType.Primary)
             {
-                gunManager.pickupGun(ItemName.Replace("(Clone)", ""), true);
+                gunManager.pickupGun(ItemName.Replace("(Clone)", ""), gunGravity.gunInventoryType);
                 Destroy(other.gameObject);
             }
             if (gunManager.SecondaryGun == "" && gunGravity.gunInventoryType == GunInventoryType.Secondary)
             {
-                gunManager.pickupGun(ItemName.Replace("(Clone)", ""), false);
+                gunManager.pickupGun(ItemName.Replace("(Clone)", ""), gunGravity.gunInventoryType);
                 Destroy(other.gameObject);
             }
         }
