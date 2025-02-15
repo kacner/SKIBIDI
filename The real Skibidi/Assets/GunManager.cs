@@ -2,7 +2,6 @@ using Movement;
 using NUnit.Framework.Internal;
 using Unity.VisualScripting;
 using UnityEngine;
-
 public class GunManager : MonoBehaviour
 {
     [SerializeField] private GameObject[] guns;
@@ -28,6 +27,7 @@ public class GunManager : MonoBehaviour
         }
         deActivateAllGuns(4);
         ActivateGun(Melee, GunInventoryType.Melee);
+        gunUiManager.UpdateWeaponSlot(GunInventoryType.Melee, Melee);
     }
 
     void deActivateAllGuns(int deactivateSlot = 0)
@@ -50,6 +50,7 @@ public class GunManager : MonoBehaviour
 
     void ActivateGun(string GunName, GunInventoryType type)
     {
+        gunUiManager.HighlightSelectedWeapon(type);
         if (type == GunInventoryType.Primary)
         {
 
@@ -103,6 +104,7 @@ public class GunManager : MonoBehaviour
 
     public void pickupGun(string GunName, GunInventoryType type)
     {
+        gunUiManager.UpdateWeaponSlot(type, GunName);
         if (type == GunInventoryType.Primary)
         {
             if (PrimaryGun == "")
@@ -138,10 +140,6 @@ public class GunManager : MonoBehaviour
 
     private void Update()
     {
-
-        gunUiManager.UpdateSlot(SelectedSlot - 1, SecondaryGun);
-
-
         if (Input.GetKeyDown(KeyCode.G) && (PrimaryGun != "" || SecondaryGun != ""))
         {
             StartCoroutine(gunPickupScript.GunMangerDrop());
@@ -182,7 +180,18 @@ public class GunManager : MonoBehaviour
     {
         if (SelectedSlot != newSlotSelected)
         {
-            if (newSlotSelected == 1 && PrimaryGun != "")
+            if (newSlotSelected < 1 || newSlotSelected > 3)
+            {
+                Debug.LogWarning($"Invalid slot selection: {newSlotSelected}");
+                return;
+            }
+            if (newSlotSelected == 3)
+            {
+                deActivateAllGuns();
+                ActivateGun(Melee, GunInventoryType.Melee);
+                SelectedSlot = newSlotSelected;
+            }
+            else if (newSlotSelected == 1 && PrimaryGun != "")
             {
                 deActivateAllGuns();
                 ActivateGun(PrimaryGun, GunInventoryType.Primary);
@@ -194,12 +203,7 @@ public class GunManager : MonoBehaviour
                 ActivateGun(SecondaryGun, GunInventoryType.Secondary);
                 SelectedSlot = newSlotSelected;
             }
-            else if (newSlotSelected == 3 && Melee != "")
-            {
-                deActivateAllGuns();
-                ActivateGun(Melee, GunInventoryType.Melee);
-                SelectedSlot = newSlotSelected;
-            }
+            
         }
     }
 
@@ -211,6 +215,7 @@ public class GunManager : MonoBehaviour
             {
                 if (gunPickups[i].name.Contains(PrimaryGun)) //succesfully dropps a gun
                 {
+                    gunUiManager.UpdateWeaponSlot(GunInventoryType.Primary, "");
                     GameObject dropppedGun = Instantiate(gunPickups[i], DropPoint.position, Quaternion.identity);
                     deActivateAllGuns(1);
                     Rigidbody DroppedsRigidbody = dropppedGun.GetComponent<Rigidbody>();
@@ -233,6 +238,7 @@ public class GunManager : MonoBehaviour
             {
                 if (gunPickups[i].name.Contains(SecondaryGun)) //succesfully dropps a gun
                 {
+                    gunUiManager.UpdateWeaponSlot(GunInventoryType.Secondary, "");
                     GameObject dropppedGun = Instantiate(gunPickups[i], DropPoint.position, Quaternion.identity);
                     deActivateAllGuns(2);
                     Rigidbody DroppedsRigidbody = dropppedGun.GetComponent<Rigidbody>();

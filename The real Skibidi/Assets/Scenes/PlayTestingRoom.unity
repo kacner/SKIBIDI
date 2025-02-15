@@ -646,11 +646,11 @@ Light:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 70468998}
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 11
   m_Type: 2
   m_Color: {r: 0.8207547, g: 0.6375877, b: 0.26713243, a: 1}
-  m_Intensity: 1.45
+  m_Intensity: 0.19
   m_Range: 1.15
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -38192,17 +38192,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 75c0566493eb7d9499b787e2a6293f71, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gunIcons:
-  - gunIcon: {fileID: 21300000, guid: df0f30c2c73b7b5449620f3e514ed7a3, type: 3}
-    GunName: K-Pist
-  - gunIcon: {fileID: 21300000, guid: ea62d4017dbb42f4da94cca857babae8, type: 3}
-    GunName: Karambit
-  - gunIcon: {fileID: 21300000, guid: df7c7cc588488cf41986aa47a1726c49, type: 3}
-    GunName: Mec-9
-  gunSlots:
-  - {fileID: 495165842}
-  - {fileID: 1646360148}
-  - {fileID: 898952833}
+  primarySlot: {fileID: 495165842}
+  secondarySlot: {fileID: 1646360148}
+  meleeSlot: {fileID: 898952833}
+  weaponIcons:
+  - weaponName: K-Pist
+    iconSprite: {fileID: 21300000, guid: df0f30c2c73b7b5449620f3e514ed7a3, type: 3}
+  - weaponName: Mec-9
+    iconSprite: {fileID: 21300000, guid: df7c7cc588488cf41986aa47a1726c49, type: 3}
+  - weaponName: Karambit
+    iconSprite: {fileID: 21300000, guid: ea62d4017dbb42f4da94cca857babae8, type: 3}
+  selectedSlotColor: {r: 0.8666667, g: 0.8980392, b: 0.26666668, a: 0.78431374}
+  unselectedSlotColor: {r: 1, g: 1, b: 1, a: 0.78431374}
 --- !u!1001 &1949243105
 PrefabInstance:
   m_ObjectHideFlags: 0
