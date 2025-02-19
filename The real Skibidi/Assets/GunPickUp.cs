@@ -1,13 +1,14 @@
+using Photon.Pun;
 using System.Collections;
 using UnityEngine;
 
-public class GunPickUp : MonoBehaviour
+public class GunPickUp : MonoBehaviourPunCallbacks
 {
     [SerializeField] private GunManager gunManager;
     [SerializeField] private Collider collider;
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.tag == "PickUpable")
+        if (other.gameObject.tag == "PickUpable" && photonView.IsMine)
         {
             GunCustomGravity gunGravity = other.GetComponent<GunCustomGravity>();
             string ItemName = other.gameObject.name.Replace("Pickup", "");

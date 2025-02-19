@@ -1,6 +1,7 @@
+using Photon.Pun;
 using UnityEngine;
 
-public class SwayTheyDontLoveYouLikeILoveYou : MonoBehaviour
+public class SwayTheyDontLoveYouLikeILoveYou : MonoBehaviourPunCallbacks
 {
     [SerializeField] private float strenght;
     [SerializeField] private float maxSWAY;
@@ -15,14 +16,20 @@ public class SwayTheyDontLoveYouLikeILoveYou : MonoBehaviour
 
     private void Start()
     {
-        iniRotation = transform.localRotation;
-        iniPos = transform.localPosition;
+        if (photonView.IsMine)
+        {
+            iniRotation = transform.localRotation;
+            iniPos = transform.localPosition;
+        }
     }
 
     private void Update()
     {
-        Sway();
-        RotateSway();
+        if (photonView.IsMine)
+        {
+            Sway();
+            RotateSway();
+        }
     }
 
     void Sway()
