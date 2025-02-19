@@ -99,7 +99,7 @@ namespace Movement
             }
             else
             {
-                m_Camera.gameObject.SetActive(false);
+                m_Camera.enabled = false;
                 string otherPlayerUsername = UsernameManager.Instance.GetUsername(photonView);
 
                 UsernameTextObj.text = otherPlayerUsername;

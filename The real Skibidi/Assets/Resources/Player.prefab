@@ -21871,8 +21871,6 @@ GameObject:
   m_Component:
   - component: {fileID: 8339057553202855330}
   - component: {fileID: 5810645233995318613}
-  - component: {fileID: 2371273912177155736}
-  - component: {fileID: 1259562108290771167}
   m_Layer: 0
   m_Name: <<GunManager>>
   m_TagString: Untagged
@@ -21927,45 +21925,6 @@ MonoBehaviour:
   playerMovement: {fileID: 6075537624286057592}
   gunPickupScript: {fileID: 5098570791997749734}
   gunUiManager: {fileID: 3660439206948264363}
---- !u!114 &2371273912177155736
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4944968742888945876}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ObservedComponentsFoldoutOpen: 1
-  Group: 0
-  prefixField: -1
-  Synchronization: 3
-  OwnershipTransfer: 0
-  observableSearch: 2
-  ObservedComponents:
-  - {fileID: 1259562108290771167}
-  sceneViewId: 0
-  InstantiationId: 0
-  isRuntimeInstantiated: 0
---- !u!114 &1259562108290771167
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4944968742888945876}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_SynchronizePosition: 1
-  m_SynchronizeRotation: 1
-  m_SynchronizeScale: 0
-  m_UseLocal: 1
 --- !u!1 &5031446745623432272
 GameObject:
   m_ObjectHideFlags: 0

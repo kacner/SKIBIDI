@@ -1,7 +1,5 @@
 using Movement;
-using NUnit.Framework.Internal;
 using Photon.Pun;
-using Unity.VisualScripting;
 using UnityEngine;
 public class GunManager : MonoBehaviourPunCallbacks
 {
@@ -20,8 +18,6 @@ public class GunManager : MonoBehaviourPunCallbacks
     [SerializeField] private GunUiManager gunUiManager;
     private void Start()
     {
-        if (photonView.IsMine)
-        {
             Melee = "Karambit";
             playerWeapondScripts = new PlayerWeapon[guns.Length];
             for (int i = 0; i < guns.Length; i++)
@@ -31,34 +27,28 @@ public class GunManager : MonoBehaviourPunCallbacks
             deActivateAllGuns(4);
             ActivateGun(Melee, GunInventoryType.Melee);
             gunUiManager.UpdateWeaponSlot(GunInventoryType.Melee, Melee);
-        }
     }
-
     void deActivateAllGuns(int deactivateSlot = 0)
     {
-        if (photonView.IsMine)
+
+        if (deactivateSlot == 1)
+            PrimaryGun = "";
+        else if (deactivateSlot == 2)
+            SecondaryGun = "";
+        else if (deactivateSlot == 4)
         {
-            if (deactivateSlot == 1)
-                PrimaryGun = "";
-            else if (deactivateSlot == 2)
-                SecondaryGun = "";
-            else if (deactivateSlot == 4)
-            {
-                PrimaryGun = "";
-                SecondaryGun = "";
-            }
-            for (int i = 0; i < guns.Length; i++)
-            {
-                guns[i].SetActive(false);
-                playerWeapondScripts[i]?.ForceReset();
-            }
+            PrimaryGun = "";
+            SecondaryGun = "";
+        }
+        for (int i = 0; i < guns.Length; i++)
+        {
+            guns[i].SetActive(false);
+            playerWeapondScripts[i]?.ForceReset();
         }
     }
 
     void ActivateGun(string GunName, GunInventoryType type)
     {
-        if (photonView.IsMine)
-        {
             gunUiManager.HighlightSelectedWeapon(type);
             if (type == GunInventoryType.Primary)
             {
@@ -109,13 +99,10 @@ public class GunManager : MonoBehaviourPunCallbacks
                     }
                 }
             }
-        }
     }
 
     public void pickupGun(string GunName, GunInventoryType type)
     {
-        if (photonView.IsMine)
-        {
             gunUiManager.UpdateWeaponSlot(type, GunName);
             if (type == GunInventoryType.Primary)
             {
@@ -148,7 +135,6 @@ public class GunManager : MonoBehaviourPunCallbacks
                     ActivateGun(Melee, GunInventoryType.Melee);
                 }
             }
-        }
     }
 
     private void Update()
@@ -160,7 +146,6 @@ public class GunManager : MonoBehaviourPunCallbacks
                 StartCoroutine(gunPickupScript.GunMangerDrop());
                 DropGun();
             }
-
             if (Input.GetKeyDown(KeyCode.Alpha1))
             {
                 updateHeldItem(1);
@@ -173,8 +158,7 @@ public class GunManager : MonoBehaviourPunCallbacks
             {
                 updateHeldItem(3);
             }
-
-
+        }
             if (SelectedSlot == 1 && PrimaryGun == "")
             {
                 if (SecondaryGun != "")
@@ -189,13 +173,11 @@ public class GunManager : MonoBehaviourPunCallbacks
                 else
                     updateHeldItem(3);
             }
-        }
+        
     }
 
     void updateHeldItem(int newSlotSelected)
     {
-        if (photonView.IsMine)
-        {
             if (SelectedSlot != newSlotSelected)
             {
                 if (newSlotSelected < 1 || newSlotSelected > 3)
@@ -223,13 +205,10 @@ public class GunManager : MonoBehaviourPunCallbacks
                 }
 
             }
-        }
     }
 
     private void DropGun()
     {
-        if (photonView.IsMine)
-        {
             if (SelectedSlot == 1 && PrimaryGun != "")
             {
                 for (int i = 0; i < gunPickups.Length; i++)
@@ -237,7 +216,8 @@ public class GunManager : MonoBehaviourPunCallbacks
                     if (gunPickups[i].name.Contains(PrimaryGun)) //succesfully dropps a gun
                     {
                         gunUiManager.UpdateWeaponSlot(GunInventoryType.Primary, "");
-                        GameObject dropppedGun = Instantiate(gunPickups[i], DropPoint.position, Quaternion.identity);
+                        GameObject dropppedGun = PhotonNetwork.Instantiate(gunPickups[i].name, DropPoint.position, Quaternion.identity);
+                        print(dropppedGun);
                         deActivateAllGuns(1);
                         Rigidbody DroppedsRigidbody = dropppedGun.GetComponent<Rigidbody>();
                         DroppedsRigidbody.AddForce(transform.forward * DroppForce, ForceMode.Impulse);
@@ -261,7 +241,8 @@ public class GunManager : MonoBehaviourPunCallbacks
                     if (gunPickups[i].name.Contains(SecondaryGun)) //succesfully dropps a gun
                     {
                         gunUiManager.UpdateWeaponSlot(GunInventoryType.Secondary, "");
-                        GameObject dropppedGun = Instantiate(gunPickups[i], DropPoint.position, Quaternion.identity);
+                        GameObject dropppedGun = PhotonNetwork.Instantiate(gunPickups[i].name, DropPoint.position, Quaternion.identity);
+                        print(dropppedGun);
                         deActivateAllGuns(2);
                         Rigidbody DroppedsRigidbody = dropppedGun.GetComponent<Rigidbody>();
                         DroppedsRigidbody.AddForce(transform.forward * DroppForce, ForceMode.Impulse);
@@ -280,5 +261,5 @@ public class GunManager : MonoBehaviourPunCallbacks
             else
                 print("You dont have any guns");
         }
-    }
+    
 }

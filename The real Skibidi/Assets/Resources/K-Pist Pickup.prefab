@@ -1193,7 +1193,8 @@ GameObject:
   - component: {fileID: 6533251886839384857}
   - component: {fileID: 6279237183569349424}
   - component: {fileID: 2830348154817015733}
-  - component: {fileID: -1067796806971698497}
+  - component: {fileID: 6838594518794641264}
+  - component: {fileID: 6037576468220707032}
   m_Layer: 0
   m_Name: K-Pist Pickup
   m_TagString: PickUpable
@@ -1296,7 +1297,30 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Gravity: 20
   gunInventoryType: 0
---- !u!114 &-1067796806971698497
+--- !u!114 &6838594518794641264
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7838074548473936897}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents:
+  - {fileID: 6037576468220707032}
+  sceneViewId: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
+--- !u!114 &6037576468220707032
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

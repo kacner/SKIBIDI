@@ -26,7 +26,8 @@ namespace Photon.Pun
     #if UNITY_EDITOR
     using UnityEditor;
     using System.IO;
-    #endif
+    using System.Collections;
+#endif
 
 
     public struct InstantiateParameters
@@ -2467,7 +2468,6 @@ namespace Photon.Pun
                 throw new Exception(string.Format("AllocateViewID() failed. User {0} is out of viewIDs. It seems all available are in use.", ownerId));
             }
         }
-
 
         public static GameObject Instantiate(string prefabName, Vector3 position, Quaternion rotation, byte group = 0, object[] data = null)
         {

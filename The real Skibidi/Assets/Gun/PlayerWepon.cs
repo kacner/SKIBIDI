@@ -53,20 +53,15 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
 
     void Start()
     {
-        if (photonView.IsMine)
-        {
             ammunitionAmount = maxAmmunition;
             recoil = GetComponent<VisualRecoil>();
             camerashake = GetComponent<CameraShake>();
             animation = GetComponent<Animation>();
             playerController = GetComponentInParent<PlayerController>();
             weaponRecoil = GetComponent<WeaponRecoil>();
-        }
     }
     public void ForceReset()
     {
-        if (photonView.IsMine)
-        {
             canShoot = true;
             isReloading = false;
             muzzleflash.Stop();
@@ -74,10 +69,9 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
 
             foreach (GameObject item in trails)
             {
-                Destroy(item);
+                PhotonNetwork.Destroy(item);
             }
             trails.Clear();
-        }
     }
 
     void Update()
@@ -131,8 +125,6 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
 
     void FireBullet()
     {
-        if (photonView.IsMine)
-        {
             ammunitionAmount--;
             updateAmmoText();
             canShoot = false;
@@ -144,16 +136,12 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
 
             ShootRaycast();
             StartCoroutine(FireRateCooldown());
-        }
     }
     IEnumerator Light()
     {
-        if (photonView.IsMine)
-        {
             light.enabled = true;
             yield return new WaitForSeconds(0.1f);
             light.enabled = false;
-        }
     }
 
     void updateAmmoText()
@@ -179,9 +167,7 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
     
     private IEnumerator TrailAnimation(RaycastHit hit)
     {
-        if (photonView.IsMine)
-        {
-            GameObject SpawnedTrail = Instantiate(trail, firePoint.position, Quaternion.identity);
+            GameObject SpawnedTrail = PhotonNetwork.Instantiate(trail.name, firePoint.position, Quaternion.identity);
             trails.Add(SpawnedTrail);
 
             float timer = 0;
@@ -194,13 +180,10 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
                 yield return null;
             }
             StartCoroutine(HitSpark(hit.point, hit.normal));
-            Destroy(SpawnedTrail);
-        }
+            PhotonNetwork.Destroy(SpawnedTrail);
     }
     void ShootRaycast()
     {
-        if (photonView.IsMine)
-        {
             Vector3 screenCenter = new Vector3(Screen.width / 2f, Screen.height / 2f, 0f);
 
             Ray ray = playerCamera.ScreenPointToRay(screenCenter);
@@ -239,29 +222,23 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
             camerashake.StartShake();
             if (animation != null)
                 animation.Play();
-        }
     }
 
     IEnumerator HitSpark(Vector3 pos, Vector3 normal)
     {
-        if (photonView.IsMine)
-        {
             Quaternion rotation = Quaternion.LookRotation(normal);
             GameObject spark = Instantiate(hittingSparks, pos, rotation);
 
             CreateBulletHole(pos, rotation);
 
             yield return new WaitForSeconds(0.1f);
-            Destroy(spark);
-        }
+            PhotonNetwork.Destroy(spark);
     }
 
     private void CreateBulletHole(Vector3 pos, Quaternion rotation)
     {
-        if (photonView.IsMine)
-        {
             Vector3 adjustedPosition = pos + rotation * Vector3.forward * 0.01f;
-            GameObject decal = Instantiate(bulletHolePrefab, adjustedPosition, rotation);
+            GameObject decal = PhotonNetwork.Instantiate(bulletHolePrefab.name, adjustedPosition, rotation);
             decal.transform.parent = BulletHoleFoder;
             SpriteRenderer spriteRenderer = decal.GetComponent<SpriteRenderer>();
 
@@ -269,22 +246,16 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
 
             int rnd = Random.RandomRange(0, BulletHoles.Length);
             spriteRenderer.sprite = BulletHoles[rnd];
-        }
     }
 
     private IEnumerator FireRateCooldown()
     {
-        if (photonView.IsMine)
-        {
             yield return new WaitForSeconds(fireRate);
             canShoot = true;
-        }
     }
 
     private IEnumerator Reload()
     {
-        if (photonView.IsMine)
-        {
             isReloading = true;
             Debug.Log("Reloading...");
             yield return new WaitForSeconds(reloadTime);
@@ -293,7 +264,5 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
             isReloading = false;
             Debug.Log("Reload complete!");
             updateAmmoText();
-
-        }
     }
 }
