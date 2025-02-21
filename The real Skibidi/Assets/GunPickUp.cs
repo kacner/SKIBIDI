@@ -17,12 +17,18 @@ public class GunPickUp : MonoBehaviourPunCallbacks
             if (gunManager.PrimaryGun == "" && gunGravity.gunInventoryType == GunInventoryType.Primary)
             {
                 gunManager.pickupGun(ItemName.Replace("(Clone)", ""), gunGravity.gunInventoryType);
-                PhotonNetwork.Destroy(other.gameObject);
+                if (Application.isEditor)
+                    Destroy(other.gameObject);
+                else
+                    PhotonNetwork.Destroy(other.gameObject);
             }
             if (gunManager.SecondaryGun == "" && gunGravity.gunInventoryType == GunInventoryType.Secondary)
             {
                 gunManager.pickupGun(ItemName.Replace("(Clone)", ""), gunGravity.gunInventoryType);
-                PhotonNetwork.Destroy(other.gameObject);
+                if (Application.isEditor)
+                    Destroy(other.gameObject);
+                else
+                    PhotonNetwork.Destroy(other.gameObject);
             }
         }
     }

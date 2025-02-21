@@ -13,7 +13,6 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
     [SerializeField] private GameObject hittingSparks;
     [SerializeField] private LayerMask playerHitMask;
     [SerializeField] private TextMeshProUGUI ammoText;
-    [SerializeField] private Transform BulletHoleFoder;
 
     [Space]
 
@@ -30,7 +29,6 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
     [Header("Bloom")]
     [SerializeField] public float bloomAngleMaxAmout;
     [SerializeField] public float MaxVelocityForBloom;
-
     private bool canShoot = true;
     private bool isReloading = false;
     private bool isMouse0;
@@ -62,26 +60,25 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
     }
     public void ForceReset()
     {
-            canShoot = true;
-            isReloading = false;
-            muzzleflash.Stop();
-            light.enabled = false;
+        canShoot = true;
+        isReloading = false;
+        muzzleflash.Stop();
+        light.enabled = false;
 
-            foreach (GameObject item in trails)
-            {
+        foreach (GameObject item in trails)
+        {
+
+            if (Application.isEditor)
+                Destroy(item);
+            else
                 PhotonNetwork.Destroy(item);
-            }
-            trails.Clear();
+        }
+        trails.Clear();
     }
 
     void Update()
     {
-        if (photonView.IsMine)
-        {
-            if (!photonView.IsMine) return;
-
             HandleInput();
-
             if (isMouse0 && canShoot && !isReloading)
             {
                 StartCoroutine(AutoFire());
@@ -95,7 +92,6 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
             {
                 StartCoroutine(Reload());
             }
-        }
     }
 
     void HandleInput()
@@ -113,13 +109,10 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
 
     private IEnumerator AutoFire()
     {
-        if (photonView.IsMine)
+        while (isMouse0 && canShoot && ammunitionAmount > 0 && !isReloading)
         {
-            while (isMouse0 && canShoot && ammunitionAmount > 0 && !isReloading)
-            {
-                FireBullet();
-                yield return new WaitForSeconds(fireRate);
-            }
+            FireBullet();
+            yield return new WaitForSeconds(fireRate);
         }
     }
 
@@ -163,23 +156,32 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
             ammoText.text = $"{ammunitionAmount} / {maxAmmunition}  {AmmoCount}";
         }
     }
-    
-    
+
+
     private IEnumerator TrailAnimation(RaycastHit hit)
     {
-            GameObject SpawnedTrail = PhotonNetwork.Instantiate(trail.name, firePoint.position, Quaternion.identity);
-            trails.Add(SpawnedTrail);
+        GameObject SpawnedTrail;
+        if (Application.isEditor)
+            SpawnedTrail = Instantiate(trail, firePoint.position, Quaternion.identity);
+        else
+            SpawnedTrail = PhotonNetwork.Instantiate(trail.name, firePoint.position, Quaternion.identity);
 
-            float timer = 0;
-            float duration = 0.1f;
+        trails.Add(SpawnedTrail);
 
-            while (timer < duration)
-            {
-                timer += Time.deltaTime;
-                SpawnedTrail.transform.position = Vector3.Lerp(SpawnedTrail.transform.position, hit.point, timer / duration);
-                yield return null;
-            }
-            StartCoroutine(HitSpark(hit.point, hit.normal));
+        float timer = 0;
+        float duration = 0.1f;
+
+        while (timer < duration)
+        {
+            timer += Time.deltaTime;
+            SpawnedTrail.transform.position = Vector3.Lerp(SpawnedTrail.transform.position, hit.point, timer / duration);
+            yield return null;
+        }
+        StartCoroutine(HitSpark(hit.point, hit.normal, hit.collider));
+
+        if (Application.isEditor)
+            Destroy(SpawnedTrail);
+        else
             PhotonNetwork.Destroy(SpawnedTrail);
     }
     void ShootRaycast()
@@ -224,45 +226,63 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
                 animation.Play();
     }
 
-    IEnumerator HitSpark(Vector3 pos, Vector3 normal)
+    IEnumerator HitSpark(Vector3 pos, Vector3 normal, Collider hit)
     {
-            Quaternion rotation = Quaternion.LookRotation(normal);
-            GameObject spark = Instantiate(hittingSparks, pos, rotation);
+        Quaternion rotation = Quaternion.LookRotation(normal);
 
-            CreateBulletHole(pos, rotation);
+        GameObject spark;
 
-            yield return new WaitForSeconds(0.1f);
+        if (Application.isEditor)
+            spark = Instantiate(hittingSparks, pos, rotation);
+        else
+            spark = PhotonNetwork.Instantiate(hittingSparks.name, pos, rotation);
+
+        CreateBulletHole(pos, rotation, hit);
+
+        yield return new WaitForSeconds(5f);
+
+        if (Application.isEditor)
+            Destroy(spark);
+        else
             PhotonNetwork.Destroy(spark);
     }
 
-    private void CreateBulletHole(Vector3 pos, Quaternion rotation)
+    private void CreateBulletHole(Vector3 pos, Quaternion rotation, Collider hit)
     {
-            Vector3 adjustedPosition = pos + rotation * Vector3.forward * 0.01f;
-            GameObject decal = PhotonNetwork.Instantiate(bulletHolePrefab.name, adjustedPosition, rotation);
-            decal.transform.parent = BulletHoleFoder;
-            SpriteRenderer spriteRenderer = decal.GetComponent<SpriteRenderer>();
+        Vector3 adjustedPosition = pos + rotation * Vector3.forward * 0.01f;
 
-            decal.transform.rotation = Quaternion.Euler(decal.transform.rotation.eulerAngles.x, decal.transform.rotation.eulerAngles.y, Random.RandomRange(-360f, 360f));
+        GameObject decal;
 
-            int rnd = Random.RandomRange(0, BulletHoles.Length);
-            spriteRenderer.sprite = BulletHoles[rnd];
+        if (Application.isEditor)
+            decal = Instantiate(bulletHolePrefab, adjustedPosition, rotation);
+        else
+            decal = PhotonNetwork.Instantiate(bulletHolePrefab.name, adjustedPosition, rotation);
+            
+        decal.transform.parent = hit.transform;
+
+        SpriteRenderer spriteRenderer = decal.GetComponent<SpriteRenderer>();
+
+        decal.transform.rotation = Quaternion.Euler(decal.transform.rotation.eulerAngles.x, decal.transform.rotation.eulerAngles.y, Random.RandomRange(-360f, 360f));
+
+        int rnd = Random.RandomRange(0, BulletHoles.Length);
+        spriteRenderer.sprite = BulletHoles[rnd];
     }
 
     private IEnumerator FireRateCooldown()
     {
-            yield return new WaitForSeconds(fireRate);
-            canShoot = true;
+        yield return new WaitForSeconds(fireRate);
+        canShoot = true;
     }
 
     private IEnumerator Reload()
     {
-            isReloading = true;
-            Debug.Log("Reloading...");
-            yield return new WaitForSeconds(reloadTime);
-            weaponRecoil.ResetRecoil();
-            ammunitionAmount = maxAmmunition;
-            isReloading = false;
-            Debug.Log("Reload complete!");
-            updateAmmoText();
+        isReloading = true;
+        Debug.Log("Reloading...");
+        yield return new WaitForSeconds(reloadTime);
+        weaponRecoil.ResetRecoil();
+        ammunitionAmount = maxAmmunition;
+        isReloading = false;
+        Debug.Log("Reload complete!");
+        updateAmmoText();
     }
 }

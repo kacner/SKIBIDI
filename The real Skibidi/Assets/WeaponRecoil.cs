@@ -152,6 +152,7 @@ public class WeaponRecoil : MonoBehaviour
     }
 }*/using UnityEngine;
 using System.Collections;
+using Photon.Pun;
 
 public class WeaponRecoil : MonoBehaviour
 {
@@ -204,7 +205,11 @@ public class WeaponRecoil : MonoBehaviour
 
     void SetupRecoilContainer()
     {
-        recoilContainer = new GameObject("RecoilContainer");
+        if (Application.isEditor)
+            recoilContainer = new GameObject("RecoilContainer");
+        else
+            recoilContainer = PhotonNetwork.Instantiate("RecoilContainer", Vector3.zero, Quaternion.identity, 0);
+
         recoilContainer.transform.SetParent(mainCamera.transform.parent);
         recoilContainer.transform.localPosition = Vector3.zero;
         recoilContainer.transform.localRotation = Quaternion.identity;
