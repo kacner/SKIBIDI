@@ -154,7 +154,7 @@ public class WeaponRecoil : MonoBehaviour
 using System.Collections;
 using Photon.Pun;
 
-public class WeaponRecoil : MonoBehaviour
+public class WeaponRecoil : MonoBehaviourPunCallbacks
 {
     [Header("Recoil Settings")]
     [SerializeField] private float recoilX = 2f;
@@ -205,10 +205,7 @@ public class WeaponRecoil : MonoBehaviour
 
     void SetupRecoilContainer()
     {
-        if (Application.isEditor)
-            recoilContainer = new GameObject("RecoilContainer");
-        else
-            recoilContainer = PhotonNetwork.Instantiate("RecoilContainer", Vector3.zero, Quaternion.identity, 0);
+        recoilContainer = new GameObject("RecoilContainer");
 
         recoilContainer.transform.SetParent(mainCamera.transform.parent);
         recoilContainer.transform.localPosition = Vector3.zero;
@@ -226,6 +223,8 @@ public class WeaponRecoil : MonoBehaviour
 
     void Update()
     {
+        if (!photonView.IsMine) return;
+
         if (!isRecoiling)
         {
             currentRecoil.x = Mathf.SmoothDamp(currentRecoil.x, 0f, ref recoilVelocity.x, recoilRecoveryX * Time.deltaTime);
@@ -241,6 +240,7 @@ public class WeaponRecoil : MonoBehaviour
 
     public void AddRecoil()
     {
+        if (!photonView.IsMine) return;
 
         float recoilAmountX = Random.Range(-randomRecoilX, randomRecoilX) * recoilX;
         float recoilAmountY = Random.Range(0f, randomRecoilY) * recoilY;
@@ -267,16 +267,6 @@ public class WeaponRecoil : MonoBehaviour
         if (!isRecoiling)
         {
             StartCoroutine(RecoilCooldown());
-        }
-    }
-
-    private void ApplyRecoilToContainer()
-    {
-        if (recoilContainer != null)
-        {
-            Vector3 newRotation = new Vector3(ClampAngle(originalCameraRotation.x - currentRecoil.y, -90f, 90f), originalCameraRotation.y + currentRecoil.x, originalCameraRotation.z);
-
-            recoilContainer.transform.localRotation = Quaternion.Euler(newRotation);
         }
     }
 

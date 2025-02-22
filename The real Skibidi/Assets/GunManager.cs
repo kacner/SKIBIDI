@@ -18,15 +18,16 @@ public class GunManager : MonoBehaviourPunCallbacks
     [SerializeField] private GunUiManager gunUiManager;
     private void Start()
     {
-            Melee = "Karambit";
-            playerWeapondScripts = new PlayerWeapon[guns.Length];
-            for (int i = 0; i < guns.Length; i++)
-            {
-                playerWeapondScripts[i] = guns[i].GetComponentInChildren<PlayerWeapon>();
-            }
-            deActivateAllGuns(4);
-            ActivateGun(Melee, GunInventoryType.Melee);
-            gunUiManager.UpdateWeaponSlot(GunInventoryType.Melee, Melee);
+        if (!photonView.IsMine) return;
+        Melee = "Karambit";
+        playerWeapondScripts = new PlayerWeapon[guns.Length];
+        for (int i = 0; i < guns.Length; i++)
+        {
+            playerWeapondScripts[i] = guns[i].GetComponentInChildren<PlayerWeapon>();
+        }
+        deActivateAllGuns(4);
+        ActivateGun(Melee, GunInventoryType.Melee);
+        gunUiManager.UpdateWeaponSlot(GunInventoryType.Melee, Melee);
     }
     void deActivateAllGuns(int deactivateSlot = 0)
     {
@@ -49,92 +50,92 @@ public class GunManager : MonoBehaviourPunCallbacks
 
     void ActivateGun(string GunName, GunInventoryType type)
     {
-            gunUiManager.HighlightSelectedWeapon(type);
-            if (type == GunInventoryType.Primary)
-            {
+        gunUiManager.HighlightSelectedWeapon(type);
+        if (type == GunInventoryType.Primary)
+        {
 
-                for (int i = 0; i < guns.Length; i++)
-                {
-                    if (guns[i].name.Contains(GunName))
-                    {
-                        guns[i].SetActive(true);
-                        PrimaryGun = guns[i].name.Replace("GunHolder", "");
-                        break;
-                    }
-                    else
-                    {
-                        guns[i].SetActive(false);
-                    }
-                }
-            }
-            else if (type == GunInventoryType.Secondary)
+            for (int i = 0; i < guns.Length; i++)
             {
-                for (int i = 0; i < guns.Length; i++)
+                if (guns[i].name.Contains(GunName))
                 {
-                    if (guns[i].name.Contains(GunName))
-                    {
-                        guns[i].SetActive(true);
-                        SecondaryGun = guns[i].name.Replace("GunHolder", "");
-                        break;
-                    }
-                    else
-                    {
-                        guns[i].SetActive(false);
-                    }
+                    guns[i].SetActive(true);
+                    PrimaryGun = guns[i].name.Replace("GunHolder", "");
+                    break;
+                }
+                else
+                {
+                    guns[i].SetActive(false);
                 }
             }
-            else if (type == GunInventoryType.Melee)
+        }
+        else if (type == GunInventoryType.Secondary)
+        {
+            for (int i = 0; i < guns.Length; i++)
             {
-                for (int i = 0; i < guns.Length; i++)
+                if (guns[i].name.Contains(GunName))
                 {
-                    if (guns[i].name.Contains(GunName))
-                    {
-                        guns[i].SetActive(true);
-                        Melee = guns[i].name.Replace("GunHolder", "");
-                        break;
-                    }
-                    else
-                    {
-                        guns[i].SetActive(false);
-                    }
+                    guns[i].SetActive(true);
+                    SecondaryGun = guns[i].name.Replace("GunHolder", "");
+                    break;
+                }
+                else
+                {
+                    guns[i].SetActive(false);
                 }
             }
+        }
+        else if (type == GunInventoryType.Melee)
+        {
+            for (int i = 0; i < guns.Length; i++)
+            {
+                if (guns[i].name.Contains(GunName))
+                {
+                    guns[i].SetActive(true);
+                    Melee = guns[i].name.Replace("GunHolder", "");
+                    break;
+                }
+                else
+                {
+                    guns[i].SetActive(false);
+                }
+            }
+        }
     }
 
     public void pickupGun(string GunName, GunInventoryType type)
     {
-            gunUiManager.UpdateWeaponSlot(type, GunName);
-            if (type == GunInventoryType.Primary)
+        gunUiManager.UpdateWeaponSlot(type, GunName);
+        if (type == GunInventoryType.Primary)
+        {
+            if (PrimaryGun == "")
             {
-                if (PrimaryGun == "")
-                {
-                    deActivateAllGuns();
-                    ActivateGun(GunName, type);
-                    updateHeldItem(1);
-                }
+                deActivateAllGuns();
+                ActivateGun(GunName, type);
+                updateHeldItem(1);
+            }
 
-                PrimaryGun = GunName;
-                if (SelectedSlot == 1)
-                {
-                    ActivateGun(PrimaryGun, GunInventoryType.Primary);
-                }
-            }
-            else if (type == GunInventoryType.Secondary)
+            PrimaryGun = GunName;
+            if (SelectedSlot == 1)
             {
-                SecondaryGun = GunName;
-                if (SelectedSlot == 2)
-                {
-                    ActivateGun(SecondaryGun, GunInventoryType.Secondary);
-                }
+                ActivateGun(PrimaryGun, GunInventoryType.Primary);
             }
-            else if (type == GunInventoryType.Melee)
+        }
+        else if (type == GunInventoryType.Secondary)
+        {
+            SecondaryGun = GunName;
+            if (SelectedSlot == 2)
             {
-                Melee = GunName;
-                if (SelectedSlot == 3)
-                {
-                    ActivateGun(Melee, GunInventoryType.Melee);
-                }
+                ActivateGun(SecondaryGun, GunInventoryType.Secondary);
             }
+        }
+        else if (type == GunInventoryType.Melee)
+        {
+            Melee = GunName;
+            if (SelectedSlot == 3)
+            {
+                ActivateGun(Melee, GunInventoryType.Melee);
+            }
+        }
     }
 
     private void Update()
@@ -159,21 +160,21 @@ public class GunManager : MonoBehaviourPunCallbacks
                 updateHeldItem(3);
             }
         }
-            if (SelectedSlot == 1 && PrimaryGun == "")
-            {
-                if (SecondaryGun != "")
-                    updateHeldItem(2);
-                else
-                    updateHeldItem(3);
-            }
-            if (SelectedSlot == 2 && SecondaryGun == "")
-            {
-                if (PrimaryGun != "")
-                    updateHeldItem(1);
-                else
-                    updateHeldItem(3);
-            }
-        
+        if (SelectedSlot == 1 && PrimaryGun == "")
+        {
+            if (SecondaryGun != "")
+                updateHeldItem(2);
+            else
+                updateHeldItem(3);
+        }
+        if (SelectedSlot == 2 && SecondaryGun == "")
+        {
+            if (PrimaryGun != "")
+                updateHeldItem(1);
+            else
+                updateHeldItem(3);
+        }
+
     }
 
     void updateHeldItem(int newSlotSelected)
@@ -209,57 +210,57 @@ public class GunManager : MonoBehaviourPunCallbacks
 
     private void DropGun()
     {
-            if (SelectedSlot == 1 && PrimaryGun != "")
+        if (SelectedSlot == 1 && PrimaryGun != "")
+        {
+            for (int i = 0; i < gunPickups.Length; i++)
             {
-                for (int i = 0; i < gunPickups.Length; i++)
+                if (gunPickups[i].name.Contains(PrimaryGun)) //succesfully dropps a gun
                 {
-                    if (gunPickups[i].name.Contains(PrimaryGun)) //succesfully dropps a gun
-                    {
-                        gunUiManager.UpdateWeaponSlot(GunInventoryType.Primary, "");
-                        GameObject dropppedGun = PhotonNetwork.Instantiate(gunPickups[i].name, DropPoint.position, Quaternion.identity);
-                        print(dropppedGun);
-                        deActivateAllGuns(1);
-                        Rigidbody DroppedsRigidbody = dropppedGun.GetComponent<Rigidbody>();
-                        DroppedsRigidbody.AddForce(transform.forward * DroppForce, ForceMode.Impulse);
-                        DroppedsRigidbody.AddForce(transform.up * DroppForce * 0.65f, ForceMode.Impulse);
-                        DroppedsRigidbody.AddForce(playerMovement.m_PlayerVelocity * 5.5f, ForceMode.Impulse);
+                    gunUiManager.UpdateWeaponSlot(GunInventoryType.Primary, "");
+                    GameObject dropppedGun = PhotonNetwork.Instantiate(gunPickups[i].name, DropPoint.position, Quaternion.identity);
+                    print(dropppedGun);
+                    deActivateAllGuns(1);
+                    Rigidbody DroppedsRigidbody = dropppedGun.GetComponent<Rigidbody>();
+                    DroppedsRigidbody.AddForce(transform.forward * DroppForce, ForceMode.Impulse);
+                    DroppedsRigidbody.AddForce(transform.up * DroppForce * 0.65f, ForceMode.Impulse);
+                    DroppedsRigidbody.AddForce(playerMovement.m_PlayerVelocity * 5.5f, ForceMode.Impulse);
 
-                        Vector3 randomTorque = new Vector3(Random.Range(0.2f, 0.5f), Random.Range(-0.01f, 0.01f), Random.Range(-0.01f, 0.01f)) * DroppForce * DroppRotationFactor;
+                    Vector3 randomTorque = new Vector3(Random.Range(0.2f, 0.5f), Random.Range(-0.01f, 0.01f), Random.Range(-0.01f, 0.01f)) * DroppForce * DroppRotationFactor;
 
-                        DroppedsRigidbody.AddTorque(randomTorque, ForceMode.Impulse);
-                        break;
-                    }
-                    else
-                        print("Couldent find yo stupid ahh gun hoe?");
+                    DroppedsRigidbody.AddTorque(randomTorque, ForceMode.Impulse);
+                    break;
                 }
-
+                else
+                    print("Couldent find yo stupid ahh gun hoe?");
             }
-            else if (SelectedSlot == 2 && SecondaryGun != "")
-            {
-                for (int i = 0; i < gunPickups.Length; i++)
-                {
-                    if (gunPickups[i].name.Contains(SecondaryGun)) //succesfully dropps a gun
-                    {
-                        gunUiManager.UpdateWeaponSlot(GunInventoryType.Secondary, "");
-                        GameObject dropppedGun = PhotonNetwork.Instantiate(gunPickups[i].name, DropPoint.position, Quaternion.identity);
-                        print(dropppedGun);
-                        deActivateAllGuns(2);
-                        Rigidbody DroppedsRigidbody = dropppedGun.GetComponent<Rigidbody>();
-                        DroppedsRigidbody.AddForce(transform.forward * DroppForce, ForceMode.Impulse);
-                        DroppedsRigidbody.AddForce(transform.up * DroppForce * 0.65f, ForceMode.Impulse);
-                        DroppedsRigidbody.AddForce(playerMovement.m_PlayerVelocity * 5.5f, ForceMode.Impulse);
 
-                        Vector3 randomTorque = new Vector3(Random.Range(0.2f, 0.5f), Random.Range(-0.01f, 0.01f), Random.Range(-0.01f, 0.01f)) * DroppForce * DroppRotationFactor;
-
-                        DroppedsRigidbody.AddTorque(randomTorque, ForceMode.Impulse);
-                        break;
-                    }
-                    else
-                        print("Couldent find yo stupid ahh gun hoe?");
-                }
-            }
-            else
-                print("You dont have any guns");
         }
+        else if (SelectedSlot == 2 && SecondaryGun != "")
+        {
+            for (int i = 0; i < gunPickups.Length; i++)
+            {
+                if (gunPickups[i].name.Contains(SecondaryGun)) //succesfully dropps a gun
+                {
+                    gunUiManager.UpdateWeaponSlot(GunInventoryType.Secondary, "");
+                    GameObject dropppedGun = PhotonNetwork.Instantiate(gunPickups[i].name, DropPoint.position, Quaternion.identity);
+                    print(dropppedGun);
+                    deActivateAllGuns(2);
+                    Rigidbody DroppedsRigidbody = dropppedGun.GetComponent<Rigidbody>();
+                    DroppedsRigidbody.AddForce(transform.forward * DroppForce, ForceMode.Impulse);
+                    DroppedsRigidbody.AddForce(transform.up * DroppForce * 0.65f, ForceMode.Impulse);
+                    DroppedsRigidbody.AddForce(playerMovement.m_PlayerVelocity * 5.5f, ForceMode.Impulse);
+
+                    Vector3 randomTorque = new Vector3(Random.Range(0.2f, 0.5f), Random.Range(-0.01f, 0.01f), Random.Range(-0.01f, 0.01f)) * DroppForce * DroppRotationFactor;
+
+                    DroppedsRigidbody.AddTorque(randomTorque, ForceMode.Impulse);
+                    break;
+                }
+                else
+                    print("Couldent find yo stupid ahh gun hoe?");
+            }
+        }
+        else
+            print("You dont have any guns");
+    }
     
 }

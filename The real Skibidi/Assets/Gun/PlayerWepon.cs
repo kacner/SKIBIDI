@@ -68,7 +68,7 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
         foreach (GameObject item in trails)
         {
 
-            if (Application.isEditor)
+            if (!PhotonNetwork.IsConnected)
                 Destroy(item);
             else
                 PhotonNetwork.Destroy(item);
@@ -161,7 +161,7 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
     private IEnumerator TrailAnimation(RaycastHit hit)
     {
         GameObject SpawnedTrail;
-        if (Application.isEditor)
+        if (!PhotonNetwork.IsConnected)
             SpawnedTrail = Instantiate(trail, firePoint.position, Quaternion.identity);
         else
             SpawnedTrail = PhotonNetwork.Instantiate(trail.name, firePoint.position, Quaternion.identity);
@@ -179,7 +179,7 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
         }
         StartCoroutine(HitSpark(hit.point, hit.normal, hit.collider));
 
-        if (Application.isEditor)
+        if (!PhotonNetwork.IsConnected)
             Destroy(SpawnedTrail);
         else
             PhotonNetwork.Destroy(SpawnedTrail);
@@ -232,7 +232,7 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
 
         GameObject spark;
 
-        if (Application.isEditor)
+        if (!PhotonNetwork.IsConnected)
             spark = Instantiate(hittingSparks, pos, rotation);
         else
             spark = PhotonNetwork.Instantiate(hittingSparks.name, pos, rotation);
@@ -240,8 +240,8 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
         CreateBulletHole(pos, rotation, hit);
 
         yield return new WaitForSeconds(5f);
-
-        if (Application.isEditor)
+        
+        if (!PhotonNetwork.IsConnected)
             Destroy(spark);
         else
             PhotonNetwork.Destroy(spark);
@@ -253,7 +253,7 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
 
         GameObject decal;
 
-        if (Application.isEditor)
+        if (!PhotonNetwork.IsConnected)
             decal = Instantiate(bulletHolePrefab, adjustedPosition, rotation);
         else
             decal = PhotonNetwork.Instantiate(bulletHolePrefab.name, adjustedPosition, rotation);

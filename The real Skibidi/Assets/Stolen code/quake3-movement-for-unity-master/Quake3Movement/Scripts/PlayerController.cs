@@ -77,8 +77,14 @@ namespace Movement
         public Mesh Headless;
         public Mesh NotHeadless;
 
+        [Header("Multiplayer Fixes")]
+        [SerializeField] private AudioListener audioListener;
+
         private void Awake()
         {
+            if (!photonView.IsMine)
+                Destroy(audioListener);
+
             if (photonView.IsMine)
             {
                 OG_sliding_Speed = sliding_Speed;
@@ -112,7 +118,6 @@ namespace Movement
             //print(Mathf.Abs(m_PlayerVelocity.z) + Mathf.Abs(m_PlayerVelocity.x) + ": velocity");
             if (photonView.IsMine)
             {
-
                 CheckRoofied();
 
                 m_MoveInput = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));

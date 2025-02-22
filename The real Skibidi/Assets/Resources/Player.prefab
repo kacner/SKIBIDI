@@ -6498,6 +6498,7 @@ MonoBehaviour:
   meshfilter: {fileID: 8084634447636314331}
   Headless: {fileID: -4818002257964042369, guid: f27fe5798113ff14aa0123446b313d2b, type: 3}
   NotHeadless: {fileID: 2106927320424640176, guid: 14e1193e088ac6b418ebb1f8ab09fce8, type: 3}
+  audioListener: {fileID: 7826853474026380708}
 --- !u!114 &4662822869031608103
 MonoBehaviour:
   m_ObjectHideFlags: 0
