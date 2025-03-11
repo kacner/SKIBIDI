@@ -1,7 +1,7 @@
 using Movement;
 using Photon.Pun;
 using UnityEngine;
-public class GunManager : MonoBehaviourPunCallbacks
+public class GunManager : MonoBehaviourPunCallbacks, IPunObservable
 {
     [SerializeField] private GameObject[] guns;
     private PlayerWeapon[] playerWeapondScripts;
@@ -18,7 +18,7 @@ public class GunManager : MonoBehaviourPunCallbacks
     [SerializeField] private GunUiManager gunUiManager;
     private void Start()
     {
-        if (!photonView.IsMine) return;
+       // if (!photonView.IsMine) return;
         Melee = "Karambit";
         playerWeapondScripts = new PlayerWeapon[guns.Length];
         for (int i = 0; i < guns.Length; i++)
@@ -149,17 +149,20 @@ public class GunManager : MonoBehaviourPunCallbacks
             }
             if (Input.GetKeyDown(KeyCode.Alpha1))
             {
-                updateHeldItem(1);
+                SelectedSlot = 1;
             }
             if (Input.GetKeyDown(KeyCode.Alpha2))
             {
-                updateHeldItem(2);
+                SelectedSlot = 2;
             }
             if (Input.GetKeyDown(KeyCode.Alpha3))
             {
-                updateHeldItem(3);
+                SelectedSlot = 3;
             }
         }
+
+        Debug.LogError("Selected slot: " + SelectedSlot);
+
         if (SelectedSlot == 1 && PrimaryGun == "")
         {
             if (SecondaryGun != "")
@@ -175,37 +178,50 @@ public class GunManager : MonoBehaviourPunCallbacks
                 updateHeldItem(3);
         }
 
+        //baserat på selectedslot välj vapen
+        if (SelectedSlot == 1)
+        {
+            Debug.LogError("primary");
+            updateHeldItem(1);
+        }
+        if (SelectedSlot == 2)
+        {
+            Debug.LogError("second");
+            updateHeldItem(2);
+        }
+        if (SelectedSlot == 3)
+        {
+            Debug.LogError("kniw");
+            updateHeldItem(3);
+        }
+
     }
 
     void updateHeldItem(int newSlotSelected)
     {
-            if (SelectedSlot != newSlotSelected)
-            {
                 if (newSlotSelected < 1 || newSlotSelected > 3)
                 {
                     Debug.LogWarning($"Invalid slot selection: {newSlotSelected}");
                     return;
                 }
-                if (newSlotSelected == 3)
-                {
-                    deActivateAllGuns();
-                    ActivateGun(Melee, GunInventoryType.Melee);
-                    SelectedSlot = newSlotSelected;
-                }
-                else if (newSlotSelected == 1 && PrimaryGun != "")
-                {
-                    deActivateAllGuns();
-                    ActivateGun(PrimaryGun, GunInventoryType.Primary);
-                    SelectedSlot = newSlotSelected;
-                }
-                else if (newSlotSelected == 2 && SecondaryGun != "")
-                {
-                    deActivateAllGuns();
-                    ActivateGun(SecondaryGun, GunInventoryType.Secondary);
-                    SelectedSlot = newSlotSelected;
-                }
-
-            }
+        if (newSlotSelected == 3)
+        {
+            deActivateAllGuns();
+            ActivateGun(Melee, GunInventoryType.Melee);
+            SelectedSlot = newSlotSelected;
+        }
+        else if (newSlotSelected == 1 && PrimaryGun != "")
+        {
+            deActivateAllGuns();
+            ActivateGun(PrimaryGun, GunInventoryType.Primary);
+            SelectedSlot = newSlotSelected;
+        }
+        else if (newSlotSelected == 2 && SecondaryGun != "")
+        {
+            deActivateAllGuns();
+            ActivateGun(SecondaryGun, GunInventoryType.Secondary);
+            SelectedSlot = newSlotSelected;
+        }
     }
 
     private void DropGun()
@@ -262,5 +278,22 @@ public class GunManager : MonoBehaviourPunCallbacks
         else
             print("You dont have any guns");
     }
-    
+
+
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            stream.SendNext(SelectedSlot);
+            stream.SendNext(PrimaryGun);
+            stream.SendNext(SecondaryGun);
+        }
+        else if (stream.IsReading)
+        {
+            this.SelectedSlot = (int)stream.ReceiveNext();
+            this.PrimaryGun = (string)stream.ReceiveNext();
+            this.SecondaryGun = (string)stream.ReceiveNext();
+        }
+    }
 }

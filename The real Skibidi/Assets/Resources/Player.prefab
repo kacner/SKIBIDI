@@ -5679,7 +5679,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6512740774012870572}
-  - component: {fileID: 6211795288088738983}
   - component: {fileID: 9147961850561029784}
   - component: {fileID: 4220891882746528124}
   - component: {fileID: 356670967014143866}
@@ -5709,41 +5708,6 @@ Transform:
   - {fileID: 8036623928571848714}
   m_Father: {fileID: 5332339057802070620}
   m_LocalEulerAnglesHint: {x: 0, y: 183.328, z: 0}
---- !u!114 &6211795288088738983
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2045456668759141626}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3d3a501b838c0284f84126f762249d09, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  firePoint: {fileID: 5606234392333852638}
-  playerCamera: {fileID: 2681503821906430936}
-  hittingSparks: {fileID: 100002, guid: 00fedc70b62a31e448e8ccc298257b56, type: 3}
-  playerHitMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  ammoText: {fileID: 3935133034278370109}
-  raycastDistance: 100
-  fireRate: 0.2
-  reloadTime: 2
-  maxAmmunition: 16
-  ammunitionAmount: 0
-  isAutomatic: 0
-  bloomAngleMaxAmout: 3
-  MaxVelocityForBloom: 30
-  muzzleflash: {fileID: 337396820293122274}
-  light: {fileID: 1604672654743835400}
-  trail: {fileID: 9008128420236410051, guid: 6dc975bc7a9f3724eb9435507572025b, type: 3}
-  bulletHolePrefab: {fileID: 5891031121118321821, guid: b8af076005307c7448c64d87bc054a01, type: 3}
-  BulletHoles:
-  - {fileID: 21300000, guid: bbf572ff5c8788249ad3f8f296832ad3, type: 3}
-  - {fileID: 21300000, guid: e674eeeffe4000d428745052c68f78b2, type: 3}
-  - {fileID: 21300000, guid: f05a39ce30dd8e44fb22ee12459a4c56, type: 3}
 --- !u!114 &9147961850561029784
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6514,11 +6478,12 @@ MonoBehaviour:
   ObservedComponentsFoldoutOpen: 1
   Group: 0
   prefixField: -1
-  Synchronization: 3
+  Synchronization: 1
   OwnershipTransfer: 0
   observableSearch: 2
   ObservedComponents:
   - {fileID: 439560678304158260}
+  - {fileID: 5810645233995318613}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
@@ -11699,7 +11664,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2172192984203506725}
-  - component: {fileID: 7548777847161875069}
   - component: {fileID: 4866596573990723844}
   - component: {fileID: 4957718059874674856}
   - component: {fileID: 6928503736725910001}
@@ -11730,41 +11694,6 @@ Transform:
   - {fileID: 1392006718683843371}
   m_Father: {fileID: 1447669932389709528}
   m_LocalEulerAnglesHint: {x: 0, y: 179.228, z: 0}
---- !u!114 &7548777847161875069
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3989937702040131574}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3d3a501b838c0284f84126f762249d09, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  firePoint: {fileID: 6198798393606577522}
-  playerCamera: {fileID: 2681503821906430936}
-  hittingSparks: {fileID: 100002, guid: 00fedc70b62a31e448e8ccc298257b56, type: 3}
-  playerHitMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  ammoText: {fileID: 3935133034278370109}
-  raycastDistance: 100
-  fireRate: 0.1
-  reloadTime: 2
-  maxAmmunition: 36
-  ammunitionAmount: 0
-  isAutomatic: 1
-  bloomAngleMaxAmout: 0.9
-  MaxVelocityForBloom: 20
-  muzzleflash: {fileID: 3736616556575468927}
-  light: {fileID: 5505221390366289592}
-  trail: {fileID: 9008128420236410051, guid: 6dc975bc7a9f3724eb9435507572025b, type: 3}
-  bulletHolePrefab: {fileID: 5891031121118321821, guid: b8af076005307c7448c64d87bc054a01, type: 3}
-  BulletHoles:
-  - {fileID: 21300000, guid: bbf572ff5c8788249ad3f8f296832ad3, type: 3}
-  - {fileID: 21300000, guid: e674eeeffe4000d428745052c68f78b2, type: 3}
-  - {fileID: 21300000, guid: f05a39ce30dd8e44fb22ee12459a4c56, type: 3}
 --- !u!114 &4866596573990723844
 MonoBehaviour:
   m_ObjectHideFlags: 0
