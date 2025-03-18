@@ -161,7 +161,7 @@ public class GunManager : MonoBehaviourPunCallbacks, IPunObservable
             }
         }
 
-        Debug.LogError("Selected slot: " + SelectedSlot);
+        //Debug.LogError("Selected slot: " + SelectedSlot);
 
         if (SelectedSlot == 1 && PrimaryGun == "")
         {
@@ -181,17 +181,17 @@ public class GunManager : MonoBehaviourPunCallbacks, IPunObservable
         //baserat på selectedslot välj vapen
         if (SelectedSlot == 1)
         {
-            Debug.LogError("primary");
+            //Debug.LogError("primary");
             updateHeldItem(1);
         }
         if (SelectedSlot == 2)
         {
-            Debug.LogError("second");
+            //Debug.LogError("second");
             updateHeldItem(2);
         }
         if (SelectedSlot == 3)
         {
-            Debug.LogError("kniw");
+            //Debug.LogError("kniw");
             updateHeldItem(3);
         }
 

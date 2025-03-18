@@ -51,12 +51,13 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
 
     void Start()
     {
-            ammunitionAmount = maxAmmunition;
-            recoil = GetComponent<VisualRecoil>();
-            camerashake = GetComponent<CameraShake>();
-            animation = GetComponent<Animation>();
-            playerController = GetComponentInParent<PlayerController>();
-            weaponRecoil = GetComponent<WeaponRecoil>();
+        Debug.Log("Start");
+        ammunitionAmount = maxAmmunition;
+        recoil = GetComponent<VisualRecoil>();
+        camerashake = GetComponent<CameraShake>();
+        animation = GetComponent<Animation>();
+        playerController = GetComponentInParent<PlayerController>();
+        weaponRecoil = GetComponent<WeaponRecoil>();
     }
     public void ForceReset()
     {
@@ -78,20 +79,22 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
 
     void Update()
     {
-            HandleInput();
-            if (isMouse0 && canShoot && !isReloading)
-            {
-                StartCoroutine(AutoFire());
-            }
-
-            if (reloadInput && !isReloading && !isMouse0 && ammunitionAmount < maxAmmunition)
-            {
-                StartCoroutine(Reload());
-            }
-            if (ammunitionAmount == 0 && !isReloading)
-            {
-                StartCoroutine(Reload());
-            }
+        print("test");
+        Debug.Log("test");
+        HandleInput();
+        if (isMouse0 && canShoot && !isReloading)
+        {
+            StartCoroutine(AutoFire());
+        }
+        if (reloadInput && !isReloading && !isMouse0 && ammunitionAmount < maxAmmunition)
+        {
+            StartCoroutine(Reload());
+        }
+        if (ammunitionAmount == 0 && !isReloading)
+        {
+            StartCoroutine(Reload());
+        }
+        print(isMouse0);
     }
 
     void HandleInput()
