@@ -1,299 +1,252 @@
-using Movement;
-using Photon.Pun;
 using UnityEngine;
+using Photon.Pun;
+using Movement;
+
 public class GunManager : MonoBehaviourPunCallbacks, IPunObservable
 {
-    [SerializeField] private GameObject[] guns;
-    private PlayerWeapon[] playerWeapondScripts;
-    public string PrimaryGun;
-    public string SecondaryGun;
-    public string Melee;
-    [SerializeField] private int SelectedSlot = 3;
-    [SerializeField] private GameObject[] gunPickups;
-    [SerializeField] private Transform DropPoint;
-    [SerializeField] private float DroppForce;
-    [SerializeField] private float DroppRotationFactor = 0.5f;
-    [SerializeField] private PlayerController playerMovement;
-    [SerializeField] private GunPickUp gunPickupScript;
-    [SerializeField] private GunUiManager gunUiManager;
+    [Header("Gun & Pickup References")]
+    [SerializeField] private GameObject[] guns;      
+    [SerializeField] private GameObject[] gunPickups;        
+    [SerializeField] private GunUiManager gunUiManager;    
+    [SerializeField] private GunPickUp gunPickupScript;        
+    [SerializeField] private Transform dropPoint;             
+    [SerializeField] private PlayerController playerMovement;   
+
+    [Header("Drop Settings")]
+    [SerializeField] private float dropForce = 10f;
+    [SerializeField] private float dropRotationFactor = 0.5f;
+
+    // Private state variables for tracking the current weapons
+    private PlayerWeapon[] weaponScripts;
+    public string PrimaryGun = "";
+    public string SecondaryGun = "";
+    public string MeleeGun = "Karambit"; // default melee weapon name
+    public string currentGun = "";
+    private GunInventoryType selectedSlot = GunInventoryType.Melee;  // default slot
+
     private void Start()
     {
-       // if (!photonView.IsMine) return;
-        Melee = "Karambit";
-        playerWeapondScripts = new PlayerWeapon[guns.Length];
+        // Cache weapon scripts for each gun gameobject
+        weaponScripts = new PlayerWeapon[guns.Length];
         for (int i = 0; i < guns.Length; i++)
         {
-            playerWeapondScripts[i] = guns[i].GetComponentInChildren<PlayerWeapon>();
+            weaponScripts[i] = guns[i].GetComponentInChildren<PlayerWeapon>();
         }
-        deActivateAllGuns(4);
-        ActivateGun(Melee, GunInventoryType.Melee);
-        gunUiManager.UpdateWeaponSlot(GunInventoryType.Melee, Melee);
-    }
-    void deActivateAllGuns(int deactivateSlot = 0)
-    {
-
-        if (deactivateSlot == 1)
-            PrimaryGun = "";
-        else if (deactivateSlot == 2)
-            SecondaryGun = "";
-        else if (deactivateSlot == 4)
-        {
-            PrimaryGun = "";
-            SecondaryGun = "";
-        }
-        for (int i = 0; i < guns.Length; i++)
-        {
-            guns[i].SetActive(false);
-            playerWeapondScripts[i]?.ForceReset();
-        }
-    }
-
-    void ActivateGun(string GunName, GunInventoryType type)
-    {
-        gunUiManager.HighlightSelectedWeapon(type);
-        if (type == GunInventoryType.Primary)
-        {
-
-            for (int i = 0; i < guns.Length; i++)
-            {
-                if (guns[i].name.Contains(GunName))
-                {
-                    guns[i].SetActive(true);
-                    PrimaryGun = guns[i].name.Replace("GunHolder", "");
-                    break;
-                }
-                else
-                {
-                    guns[i].SetActive(false);
-                }
-            }
-        }
-        else if (type == GunInventoryType.Secondary)
-        {
-            for (int i = 0; i < guns.Length; i++)
-            {
-                if (guns[i].name.Contains(GunName))
-                {
-                    guns[i].SetActive(true);
-                    SecondaryGun = guns[i].name.Replace("GunHolder", "");
-                    break;
-                }
-                else
-                {
-                    guns[i].SetActive(false);
-                }
-            }
-        }
-        else if (type == GunInventoryType.Melee)
-        {
-            for (int i = 0; i < guns.Length; i++)
-            {
-                if (guns[i].name.Contains(GunName))
-                {
-                    guns[i].SetActive(true);
-                    Melee = guns[i].name.Replace("GunHolder", "");
-                    break;
-                }
-                else
-                {
-                    guns[i].SetActive(false);
-                }
-            }
-        }
-    }
-
-    public void pickupGun(string GunName, GunInventoryType type)
-    {
-        gunUiManager.UpdateWeaponSlot(type, GunName);
-        if (type == GunInventoryType.Primary)
-        {
-            if (PrimaryGun == "")
-            {
-                deActivateAllGuns();
-                ActivateGun(GunName, type);
-                updateHeldItem(1);
-            }
-
-            PrimaryGun = GunName;
-            if (SelectedSlot == 1)
-            {
-                ActivateGun(PrimaryGun, GunInventoryType.Primary);
-            }
-        }
-        else if (type == GunInventoryType.Secondary)
-        {
-            SecondaryGun = GunName;
-            if (SelectedSlot == 2)
-            {
-                ActivateGun(SecondaryGun, GunInventoryType.Secondary);
-            }
-        }
-        else if (type == GunInventoryType.Melee)
-        {
-            Melee = GunName;
-            if (SelectedSlot == 3)
-            {
-                ActivateGun(Melee, GunInventoryType.Melee);
-            }
-        }
+        // Initialize by deactivating all and activating the melee weapon
+        DeactivateAllGuns();
+        ActivateGun(MeleeGun, GunInventoryType.Melee);
+        gunUiManager.UpdateWeaponSlot(GunInventoryType.Melee, MeleeGun);
     }
 
     private void Update()
     {
-        if (photonView.IsMine)
+        // Only process input if this PhotonView is owned by us
+        if (!photonView.IsMine)
+            return;
+
+        HandleInput();
+    }
+    private void HandleInput()
+    {
+        // Switch weapon slots based on key press (only if a change is requested)
+        if (Input.GetKeyDown(KeyCode.Alpha1) && selectedSlot != GunInventoryType.Primary)
         {
-            if (Input.GetKeyDown(KeyCode.G) && (PrimaryGun != "" || SecondaryGun != ""))
+            selectedSlot = GunInventoryType.Primary;
+            UpdateHeldItem();
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha2) && selectedSlot != GunInventoryType.Secondary)
+        {
+            selectedSlot = GunInventoryType.Secondary;
+            UpdateHeldItem();
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha3) && selectedSlot != GunInventoryType.Melee)
+        {
+            selectedSlot = GunInventoryType.Melee;
+            UpdateHeldItem();
+        }
+        // Drop gun from primary or secondary slot when G is pressed
+        if (Input.GetKeyDown(KeyCode.G))
+        {
+            if (selectedSlot == GunInventoryType.Primary || selectedSlot == GunInventoryType.Secondary)
             {
-                StartCoroutine(gunPickupScript.GunMangerDrop());
                 DropGun();
             }
-            if (Input.GetKeyDown(KeyCode.Alpha1))
-            {
-                SelectedSlot = 1;
-            }
-            if (Input.GetKeyDown(KeyCode.Alpha2))
-            {
-                SelectedSlot = 2;
-            }
-            if (Input.GetKeyDown(KeyCode.Alpha3))
-            {
-                SelectedSlot = 3;
-            }
         }
-
-        //Debug.LogError("Selected slot: " + SelectedSlot);
-
-        if (SelectedSlot == 1 && PrimaryGun == "")
-        {
-            if (SecondaryGun != "")
-                updateHeldItem(2);
-            else
-                updateHeldItem(3);
-        }
-        if (SelectedSlot == 2 && SecondaryGun == "")
-        {
-            if (PrimaryGun != "")
-                updateHeldItem(1);
-            else
-                updateHeldItem(3);
-        }
-
-        //baserat på selectedslot välj vapen
-        if (SelectedSlot == 1)
-        {
-            //Debug.LogError("primary");
-            updateHeldItem(1);
-        }
-        if (SelectedSlot == 2)
-        {
-            //Debug.LogError("second");
-            updateHeldItem(2);
-        }
-        if (SelectedSlot == 3)
-        {
-            //Debug.LogError("kniw");
-            updateHeldItem(3);
-        }
-
     }
-
-    void updateHeldItem(int newSlotSelected)
+    private void UpdateHeldItem()
     {
-                if (newSlotSelected < 1 || newSlotSelected > 3)
+        DeactivateAllGuns();
+
+        switch (selectedSlot)
+        {
+            case GunInventoryType.Primary:
+                if (!string.IsNullOrEmpty(PrimaryGun))
                 {
-                    Debug.LogWarning($"Invalid slot selection: {newSlotSelected}");
-                    return;
+                    ActivateGun(PrimaryGun, GunInventoryType.Primary);
                 }
-        if (newSlotSelected == 3)
-        {
-            deActivateAllGuns();
-            ActivateGun(Melee, GunInventoryType.Melee);
-            SelectedSlot = newSlotSelected;
-        }
-        else if (newSlotSelected == 1 && PrimaryGun != "")
-        {
-            deActivateAllGuns();
-            ActivateGun(PrimaryGun, GunInventoryType.Primary);
-            SelectedSlot = newSlotSelected;
-        }
-        else if (newSlotSelected == 2 && SecondaryGun != "")
-        {
-            deActivateAllGuns();
-            ActivateGun(SecondaryGun, GunInventoryType.Secondary);
-            SelectedSlot = newSlotSelected;
+                else if (!string.IsNullOrEmpty(SecondaryGun))
+                {
+                    // Fallback to secondary if primary is empty
+                    selectedSlot = GunInventoryType.Secondary;
+                    ActivateGun(SecondaryGun, GunInventoryType.Secondary);
+                }
+                else
+                {
+                    // Fallback to melee if both are empty
+                    selectedSlot = GunInventoryType.Melee;
+                    ActivateGun(MeleeGun, GunInventoryType.Melee);
+                }
+                break;
+
+            case GunInventoryType.Secondary:
+                if (!string.IsNullOrEmpty(SecondaryGun))
+                {
+                    ActivateGun(SecondaryGun, GunInventoryType.Secondary);
+                }
+                else if (!string.IsNullOrEmpty(PrimaryGun))
+                {
+                    // Fallback to primary if secondary is empty
+                    selectedSlot = GunInventoryType.Primary;
+                    ActivateGun(PrimaryGun, GunInventoryType.Primary);
+                }
+                else
+                {
+                    selectedSlot = GunInventoryType.Melee;
+                    ActivateGun(MeleeGun, GunInventoryType.Melee);
+                }
+                break;
+
+            case GunInventoryType.Melee:
+                ActivateGun(MeleeGun, GunInventoryType.Melee);
+                break;
         }
     }
 
+    public void pickupGun(string gunName, GunInventoryType type)
+    {
+        gunUiManager.UpdateWeaponSlot(type, gunName);
+        switch (type)
+        {
+            case GunInventoryType.Primary:
+                if (string.IsNullOrEmpty(PrimaryGun))
+                    PrimaryGun = gunName;
+                // Immediately update if the current slot is primary
+                if (selectedSlot == GunInventoryType.Primary)
+                    UpdateHeldItem();
+                break;
+
+            case GunInventoryType.Secondary:
+                SecondaryGun = gunName;
+                if (selectedSlot == GunInventoryType.Secondary)
+                    UpdateHeldItem();
+                break;
+
+            case GunInventoryType.Melee:
+                MeleeGun = gunName;
+                if (selectedSlot == GunInventoryType.Melee)
+                    UpdateHeldItem();
+                break;
+        }
+    }
+
+    private void ActivateGun(string gunName, GunInventoryType type)
+    {
+        // If this gun is already active, skip reactivation.
+        if (currentGun == gunName)
+            return;
+
+        gunUiManager.HighlightSelectedWeapon(type);
+        // Loop through the gun array and activate the one that matches
+        for (int i = 0; i < guns.Length; i++)
+        {
+            if (guns[i].name.Contains(gunName))
+            {
+                guns[i].SetActive(true);
+                // Update currentGun after removing any extra text if needed
+                currentGun = guns[i].name.Replace("GunHolder", "");
+            }
+            else
+            {
+                guns[i].SetActive(false);
+            }
+        }
+    }
+    private void DeactivateAllGuns()
+    {
+        currentGun = "";
+        for (int i = 0; i < guns.Length; i++)
+        {
+            guns[i].SetActive(false);
+            weaponScripts[i]?.ForceReset();
+        }
+    }
     private void DropGun()
     {
-        if (SelectedSlot == 1 && PrimaryGun != "")
+        string gunToDrop = "";
+        // Determine which gun to drop based on the current slot
+        if (selectedSlot == GunInventoryType.Primary && !string.IsNullOrEmpty(PrimaryGun))
         {
-            for (int i = 0; i < gunPickups.Length; i++)
-            {
-                if (gunPickups[i].name.Contains(PrimaryGun)) //succesfully dropps a gun
-                {
-                    gunUiManager.UpdateWeaponSlot(GunInventoryType.Primary, "");
-                    GameObject dropppedGun = PhotonNetwork.Instantiate(gunPickups[i].name, DropPoint.position, Quaternion.identity);
-                    print(dropppedGun);
-                    deActivateAllGuns(1);
-                    Rigidbody DroppedsRigidbody = dropppedGun.GetComponent<Rigidbody>();
-                    DroppedsRigidbody.AddForce(transform.forward * DroppForce, ForceMode.Impulse);
-                    DroppedsRigidbody.AddForce(transform.up * DroppForce * 0.65f, ForceMode.Impulse);
-                    DroppedsRigidbody.AddForce(playerMovement.m_PlayerVelocity * 5.5f, ForceMode.Impulse);
-
-                    Vector3 randomTorque = new Vector3(Random.Range(0.2f, 0.5f), Random.Range(-0.01f, 0.01f), Random.Range(-0.01f, 0.01f)) * DroppForce * DroppRotationFactor;
-
-                    DroppedsRigidbody.AddTorque(randomTorque, ForceMode.Impulse);
-                    break;
-                }
-                else
-                    print("Couldent find yo stupid ahh gun hoe?");
-            }
-
+            gunToDrop = PrimaryGun;
+            PrimaryGun = "";
+            gunUiManager.UpdateWeaponSlot(GunInventoryType.Primary, "");
         }
-        else if (SelectedSlot == 2 && SecondaryGun != "")
+        else if (selectedSlot == GunInventoryType.Secondary && !string.IsNullOrEmpty(SecondaryGun))
         {
-            for (int i = 0; i < gunPickups.Length; i++)
-            {
-                if (gunPickups[i].name.Contains(SecondaryGun)) //succesfully dropps a gun
-                {
-                    gunUiManager.UpdateWeaponSlot(GunInventoryType.Secondary, "");
-                    GameObject dropppedGun = PhotonNetwork.Instantiate(gunPickups[i].name, DropPoint.position, Quaternion.identity);
-                    print(dropppedGun);
-                    deActivateAllGuns(2);
-                    Rigidbody DroppedsRigidbody = dropppedGun.GetComponent<Rigidbody>();
-                    DroppedsRigidbody.AddForce(transform.forward * DroppForce, ForceMode.Impulse);
-                    DroppedsRigidbody.AddForce(transform.up * DroppForce * 0.65f, ForceMode.Impulse);
-                    DroppedsRigidbody.AddForce(playerMovement.m_PlayerVelocity * 5.5f, ForceMode.Impulse);
-
-                    Vector3 randomTorque = new Vector3(Random.Range(0.2f, 0.5f), Random.Range(-0.01f, 0.01f), Random.Range(-0.01f, 0.01f)) * DroppForce * DroppRotationFactor;
-
-                    DroppedsRigidbody.AddTorque(randomTorque, ForceMode.Impulse);
-                    break;
-                }
-                else
-                    print("Couldent find yo stupid ahh gun hoe?");
-            }
+            gunToDrop = SecondaryGun;
+            SecondaryGun = "";
+            gunUiManager.UpdateWeaponSlot(GunInventoryType.Secondary, "");
         }
         else
-            print("You dont have any guns");
+        {
+            Debug.Log("No gun to drop in the current slot.");
+            return;
+        }
+
+        // Loop through pickup prefabs to find the matching one and instantiate it
+        for (int i = 0; i < gunPickups.Length; i++)
+        {
+            if (gunPickups[i].name.Contains(gunToDrop))
+            {
+                GameObject droppedGun = PhotonNetwork.Instantiate(gunPickups[i].name, dropPoint.position, Quaternion.identity);
+                Rigidbody rb = droppedGun.GetComponent<Rigidbody>();
+                if (rb)
+                {
+                    rb.AddForce(transform.forward * dropForce, ForceMode.Impulse);
+                    rb.AddForce(transform.up * dropForce * 0.65f, ForceMode.Impulse);
+                    rb.AddForce(playerMovement.m_PlayerVelocity * 5.5f, ForceMode.Impulse);
+
+                    Vector3 randomTorque = new Vector3(
+                        Random.Range(0.2f, 0.5f),
+                        Random.Range(-0.01f, 0.01f),
+                        Random.Range(-0.01f, 0.01f)
+                    ) * dropForce * dropRotationFactor;
+
+                    rb.AddTorque(randomTorque, ForceMode.Impulse);
+                }
+                // Optionally play a drop animation or sound here using gunPickupScript
+                break;
+            }
+        }
+        // After dropping, update the held item (fallback to available weapon)
+        UpdateHeldItem();
     }
 
-
-
+    // Photon serialization to sync the weapon state over the network
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
         if (stream.IsWriting)
         {
-            stream.SendNext(SelectedSlot);
+            stream.SendNext((int)selectedSlot);
             stream.SendNext(PrimaryGun);
             stream.SendNext(SecondaryGun);
+            stream.SendNext(currentGun);
         }
-        else if (stream.IsReading)
+        else
         {
-            this.SelectedSlot = (int)stream.ReceiveNext();
+            this.selectedSlot = (GunInventoryType)(int)stream.ReceiveNext();
             this.PrimaryGun = (string)stream.ReceiveNext();
             this.SecondaryGun = (string)stream.ReceiveNext();
+            this.currentGun = (string)stream.ReceiveNext();
         }
     }
 }

@@ -69,14 +69,6 @@ namespace Movement
         private Transform m_Tran;
         private Transform m_CamTran;
 
-        [Space(10)]
-
-        [Header("SkinSettings")]
-
-        public MeshFilter meshfilter;
-        public Mesh Headless;
-        public Mesh NotHeadless;
-
         [Header("Multiplayer Fixes")]
         [SerializeField] private AudioListener audioListener;
 
@@ -101,7 +93,6 @@ namespace Movement
 
                 UsernameTextObj.text = PhotonNetwork.NickName;
 
-                meshfilter.mesh = Headless;
             }
             else
             {
@@ -109,7 +100,6 @@ namespace Movement
                 string otherPlayerUsername = UsernameManager.Instance.GetUsername(photonView);
 
                 UsernameTextObj.text = otherPlayerUsername;
-                meshfilter.mesh = NotHeadless;
             }
         }
 
