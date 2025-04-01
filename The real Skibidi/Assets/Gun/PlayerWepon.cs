@@ -49,9 +49,11 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
     private CameraShake camerashake;
     private Animation animation;
 
+    [Header("HitDetection")]
+    [SerializeField] private LayerMask playerLayer;
+
     void Start()
     {
-        Debug.Log("Start");
         ammunitionAmount = maxAmmunition;
         recoil = GetComponent<VisualRecoil>();
         camerashake = GetComponent<CameraShake>();
@@ -79,8 +81,6 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
 
     void Update()
     {
-        print("test");
-        Debug.Log("test");
         HandleInput();
         if (isMouse0 && canShoot && !isReloading)
         {
@@ -94,7 +94,6 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
         {
             StartCoroutine(Reload());
         }
-        print(isMouse0);
     }
 
     void HandleInput()
@@ -121,17 +120,17 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
 
     void FireBullet()
     {
-            ammunitionAmount--;
-            updateAmmoText();
-            canShoot = false;
+        ammunitionAmount--;
+        updateAmmoText();
+        canShoot = false;
 
-            muzzleflash.Play();
-            StartCoroutine(Light());
+        muzzleflash.Play();
+        StartCoroutine(Light());
 
-            weaponRecoil.AddRecoil();
+        weaponRecoil.AddRecoil();
 
-            ShootRaycast();
-            StartCoroutine(FireRateCooldown());
+        ShootRaycast();
+        StartCoroutine(FireRateCooldown());
     }
     IEnumerator Light()
     {
@@ -189,44 +188,47 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
     }
     void ShootRaycast()
     {
-            Vector3 screenCenter = new Vector3(Screen.width / 2f, Screen.height / 2f, 0f);
+        Vector3 screenCenter = new Vector3(Screen.width / 2f, Screen.height / 2f, 0f);
 
-            Ray ray = playerCamera.ScreenPointToRay(screenCenter);
-            Vector3 shootDirection = ray.direction;
+        Ray ray = playerCamera.ScreenPointToRay(screenCenter);
+        Vector3 shootDirection = ray.direction;
 
-            if (playerController.m_MoveInput.x != 0 || playerController.m_MoveInput.y != 0)
-            {
-                float bloomAngle = bloomAngleMaxAmout * Mathf.Min(Mathf.Abs(playerController.m_PlayerVelocity.magnitude) / 2, MaxVelocityForBloom);
-                Quaternion bloomRotation = Quaternion.Euler(
-                    Random.Range(-bloomAngle, bloomAngle),
-                    Random.Range(-bloomAngle, bloomAngle),
-                    0
-                );
-                shootDirection = bloomRotation * shootDirection;
-            }
+        if (playerController.m_MoveInput.x != 0 || playerController.m_MoveInput.y != 0)
+        {
+            float bloomAngle = bloomAngleMaxAmout * Mathf.Min(Mathf.Abs(playerController.m_PlayerVelocity.magnitude) / 2, MaxVelocityForBloom);
+            Quaternion bloomRotation = Quaternion.Euler(
+                Random.Range(-bloomAngle, bloomAngle),
+                Random.Range(-bloomAngle, bloomAngle),
+                0
+            );
+            shootDirection = bloomRotation * shootDirection;
+        }
 
-            if (Physics.Raycast(playerCamera.transform.position, shootDirection, out RaycastHit hit, raycastDistance, playerHitMask))
-            {
-                Debug.DrawLine(playerCamera.transform.position, hit.point, Color.red, 1f);
+        if (Physics.Raycast(playerCamera.transform.position, shootDirection, out RaycastHit hit, raycastDistance, playerLayer))
+        {
+            Debug.DrawLine(playerCamera.transform.position, hit.point, Color.red, 1f);
 
-                StartCoroutine(TrailAnimation(hit));
-            }
-            else
-            {
-                Vector3 endPoint = playerCamera.transform.position + shootDirection * raycastDistance;
-                Debug.DrawLine(playerCamera.transform.position, endPoint, Color.yellow, 1f);
+            StartCoroutine(TrailAnimation(hit));
 
-                RaycastHit fakeHit = new RaycastHit();
-                fakeHit.point = endPoint;
-                fakeHit.normal = -shootDirection;
-                StartCoroutine(TrailAnimation(fakeHit));
-            }
 
-            recoil.StartRecoil();
-            weaponRecoil.AddRecoil();
-            camerashake.StartShake();
-            if (animation != null)
-                animation.Play();
+                Debug.Log("HIT PLAYER");
+        }
+        else
+        {
+            Vector3 endPoint = playerCamera.transform.position + shootDirection * raycastDistance;
+            Debug.DrawLine(playerCamera.transform.position, endPoint, Color.yellow, 1f);
+
+            RaycastHit fakeHit = new RaycastHit();
+            fakeHit.point = endPoint;
+            fakeHit.normal = -shootDirection;
+            StartCoroutine(TrailAnimation(fakeHit));
+        }
+
+        recoil.StartRecoil();
+        weaponRecoil.AddRecoil();
+        camerashake.StartShake();
+        if (animation != null)
+            animation.Play();
     }
 
     IEnumerator HitSpark(Vector3 pos, Vector3 normal, Collider hit)
@@ -261,6 +263,7 @@ public class PlayerWeapon : MonoBehaviourPunCallbacks
         else
             decal = PhotonNetwork.Instantiate(bulletHolePrefab.name, adjustedPosition, rotation);
             
+        if (hit != null)
         decal.transform.parent = hit.transform;
 
         SpriteRenderer spriteRenderer = decal.GetComponent<SpriteRenderer>();

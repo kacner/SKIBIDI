@@ -48,7 +48,6 @@ public class GunManager : MonoBehaviourPunCallbacks, IPunObservable
     }
     private void HandleInput()
     {
-        // Switch weapon slots based on key press (only if a change is requested)
         if (Input.GetKeyDown(KeyCode.Alpha1) && selectedSlot != GunInventoryType.Primary)
         {
             selectedSlot = GunInventoryType.Primary;
@@ -64,7 +63,6 @@ public class GunManager : MonoBehaviourPunCallbacks, IPunObservable
             selectedSlot = GunInventoryType.Melee;
             UpdateHeldItem();
         }
-        // Drop gun from primary or secondary slot when G is pressed
         if (Input.GetKeyDown(KeyCode.G))
         {
             if (selectedSlot == GunInventoryType.Primary || selectedSlot == GunInventoryType.Secondary)
@@ -151,18 +149,17 @@ public class GunManager : MonoBehaviourPunCallbacks, IPunObservable
 
     private void ActivateGun(string gunName, GunInventoryType type)
     {
-        // If this gun is already active, skip reactivation.
         if (currentGun == gunName)
             return;
 
         gunUiManager.HighlightSelectedWeapon(type);
-        // Loop through the gun array and activate the one that matches
+
         for (int i = 0; i < guns.Length; i++)
         {
             if (guns[i].name.Contains(gunName))
             {
                 guns[i].SetActive(true);
-                // Update currentGun after removing any extra text if needed
+
                 currentGun = guns[i].name.Replace("GunHolder", "");
             }
             else
@@ -183,7 +180,7 @@ public class GunManager : MonoBehaviourPunCallbacks, IPunObservable
     private void DropGun()
     {
         string gunToDrop = "";
-        // Determine which gun to drop based on the current slot
+
         if (selectedSlot == GunInventoryType.Primary && !string.IsNullOrEmpty(PrimaryGun))
         {
             gunToDrop = PrimaryGun;
@@ -202,7 +199,7 @@ public class GunManager : MonoBehaviourPunCallbacks, IPunObservable
             return;
         }
 
-        // Loop through pickup prefabs to find the matching one and instantiate it
+
         for (int i = 0; i < gunPickups.Length; i++)
         {
             if (gunPickups[i].name.Contains(gunToDrop))
@@ -223,15 +220,15 @@ public class GunManager : MonoBehaviourPunCallbacks, IPunObservable
 
                     rb.AddTorque(randomTorque, ForceMode.Impulse);
                 }
-                // Optionally play a drop animation or sound here using gunPickupScript
+
                 break;
             }
         }
-        // After dropping, update the held item (fallback to available weapon)
+
         UpdateHeldItem();
     }
 
-    // Photon serialization to sync the weapon state over the network
+
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
         if (stream.IsWriting)
@@ -247,6 +244,7 @@ public class GunManager : MonoBehaviourPunCallbacks, IPunObservable
             this.PrimaryGun = (string)stream.ReceiveNext();
             this.SecondaryGun = (string)stream.ReceiveNext();
             this.currentGun = (string)stream.ReceiveNext();
+            UpdateHeldItem();
         }
     }
 }

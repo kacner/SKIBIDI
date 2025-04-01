@@ -43,11 +43,6 @@ public class SwayTheyDontLoveYouLikeILoveYou : MonoBehaviourPunCallbacks
         Vector3 finalPos = new Vector3(moveX, 0, moveY);
         transform.localPosition = Vector3.Lerp(transform.localPosition, finalPos + iniPos, Smoothing * Time.deltaTime);
     }
-    void GunWalk()
-    {
-        float YDisplacement = Mathf.Sin(1);
-        transform.localPosition = new Vector3(transform.localPosition.x, YDisplacement, transform.localPosition.z);
-    }
     void RotateSway()
     {
         float tiltY = Input.GetAxis("Mouse X") * TiltStrenght;
